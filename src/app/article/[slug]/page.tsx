@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ThreatBadge } from "@/components/threat-badge";
 import { ArticleCard } from "@/components/article-card";
+import { ArticleActions } from "@/components/article-actions";
 import {
   fetchArticles,
   fetchArticleBySlug,
@@ -185,32 +186,12 @@ export default async function ArticlePage({
           </div>
 
           {/* Actions */}
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-              <Bookmark className="h-3.5 w-3.5" />
-              Save
-            </Button>
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-              <Share2 className="h-3.5 w-3.5" />
-              Share
-            </Button>
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-              <Bell className="h-3.5 w-3.5" />
-              Alert me
-            </Button>
-            {article.sourceUrl && (
-              <a
-                href={article.sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  Original Source
-                </Button>
-              </a>
-            )}
-          </div>
+          <ArticleActions
+            slug={article.slug}
+            title={article.title}
+            sourceUrl={article.sourceUrl}
+            source={article.source}
+          />
 
           <Separator />
 

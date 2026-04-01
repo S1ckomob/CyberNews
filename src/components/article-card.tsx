@@ -10,6 +10,7 @@ import {
   Tag,
   Globe,
   Zap,
+  ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -189,7 +190,21 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
                 <Clock className="h-3 w-3" />
                 {formatDate(article.publishedAt)}
               </span>
-              <span className="font-mono text-[10px]">{article.source}</span>
+              <span className="flex items-center gap-1.5">
+                <span className="font-mono text-[10px]">{article.source}</span>
+                {article.sourceUrl && (
+                  <a
+                    href={article.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-muted-foreground/50 hover:text-primary transition-colors"
+                    title="Open original source"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+              </span>
             </div>
           </div>
         </CardContent>
