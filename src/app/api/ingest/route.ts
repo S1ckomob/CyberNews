@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { XMLParser } from "fast-xml-parser";
-import { supabaseAdmin } from "@/lib/supabase-server";
+import { getSupabaseAdmin } from "@/lib/supabase-server";
 
 // ---------- Types ----------
 
@@ -391,7 +391,7 @@ export async function POST(request: NextRequest) {
   // Insert with deduplication
   let totalInserted = 0;
   for (const { source, article } of allArticles) {
-    const { data: existing } = await supabaseAdmin
+    const { data: existing } = await getSupabaseAdmin()
       .from("articles")
       .select("id")
       .eq("slug", article.slug)
@@ -399,7 +399,7 @@ export async function POST(request: NextRequest) {
 
     if (existing && existing.length > 0) continue;
 
-    const { error } = await supabaseAdmin.from("articles").insert({
+    const { error } = await getSupabaseAdmin().from("articles").insert({
       ...article,
       updated_at: new Date().toISOString(),
     });

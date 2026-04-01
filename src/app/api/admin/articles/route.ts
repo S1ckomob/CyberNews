@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-server";
+import { getSupabaseAdmin } from "@/lib/supabase-server";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("articles")
     .insert(body)
     .select("id, slug")
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const { id } = await request.json();
 
-  const { error } = await supabaseAdmin
+  const { error } = await getSupabaseAdmin()
     .from("articles")
     .delete()
     .eq("id", id);

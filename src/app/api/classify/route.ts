@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateText, Output } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
 import { z } from "zod";
-import { supabaseAdmin } from "@/lib/supabase-server";
+import { getSupabaseAdmin } from "@/lib/supabase-server";
 
 const classificationSchema = z.object({
   title: z.string().describe("Concise, factual title for the threat report"),
@@ -102,7 +102,7 @@ ${raw_text}`,
   const slug = slugify(classification.title);
 
   // Check for duplicate
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await getSupabaseAdmin()
     .from("articles")
     .select("id")
     .eq("slug", slug)
@@ -116,7 +116,7 @@ ${raw_text}`,
     });
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("articles")
     .insert({
       title: classification.title,
