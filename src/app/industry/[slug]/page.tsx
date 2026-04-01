@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -62,9 +64,6 @@ const INDUSTRIES: Record<Industry, { label: string; description: string }> = {
 
 const ALL_INDUSTRIES = Object.keys(INDUSTRIES) as Industry[];
 
-export async function generateStaticParams() {
-  return ALL_INDUSTRIES.map((slug) => ({ slug }));
-}
 
 export async function generateMetadata({
   params,

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -51,10 +53,6 @@ function formatShortDate(dateString: string) {
   });
 }
 
-export async function generateStaticParams() {
-  const slugs = await fetchArticleSlugs();
-  return slugs.map((slug) => ({ slug }));
-}
 
 export async function generateMetadata({
   params,

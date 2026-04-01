@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,10 +24,6 @@ import {
   Building2,
 } from "lucide-react";
 
-export async function generateStaticParams() {
-  const ids = await fetchThreatActorIds();
-  return ids.map((id) => ({ id }));
-}
 
 export async function generateMetadata({
   params,
