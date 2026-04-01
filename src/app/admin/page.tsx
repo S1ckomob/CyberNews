@@ -464,9 +464,17 @@ export default function AdminPage() {
                 Pull latest vulnerabilities from CISA Known Exploited Vulnerabilities catalog
                 and NIST NVD critical CVEs. Deduplicates automatically.
               </p>
-              <div className="flex flex-wrap gap-2 mb-3">
-                <Badge variant="outline" className="text-xs">CISA KEV — Last 7 days</Badge>
-                <Badge variant="outline" className="text-xs">NVD — Critical CVEs, last 3 days</Badge>
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                <Badge variant="outline" className="text-xs">CISA KEV</Badge>
+                <Badge variant="outline" className="text-xs">NIST NVD</Badge>
+                <Badge variant="outline" className="text-xs">BleepingComputer</Badge>
+                <Badge variant="outline" className="text-xs">The Hacker News</Badge>
+                <Badge variant="outline" className="text-xs">Krebs on Security</Badge>
+                <Badge variant="outline" className="text-xs">Dark Reading</Badge>
+                <Badge variant="outline" className="text-xs">SecurityWeek</Badge>
+                <Badge variant="outline" className="text-xs">CyberScoop</Badge>
+                <Badge variant="outline" className="text-xs">The Record</Badge>
+                <Badge variant="outline" className="text-xs">Threatpost</Badge>
               </div>
               <Button onClick={handleIngest} disabled={ingesting} className="gap-1.5">
                 {ingesting ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
