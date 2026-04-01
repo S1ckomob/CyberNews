@@ -25,7 +25,7 @@ interface HelpItem {
 
 const helpItems: HelpItem[] = [
   // Pages
-  { category: "page", title: "Dashboard", description: "Real-time intelligence feed with search, filters by severity/category/industry, and live updates. Your main command center.", icon: LayoutDashboard, href: "/dashboard", keywords: "feed filter search realtime live articles" },
+  { category: "page", title: "Intelligence Feed", description: "All threat intelligence with search, filters by severity/category/industry, and live updates. Full feed with advanced filtering.", icon: LayoutDashboard, href: "/intelligence", keywords: "feed filter search realtime live articles intelligence" },
   { category: "page", title: "Daily Briefing", description: "Executive threat summary with 24h and 3-day windows. Critical threats, zero-days, ransomware, category breakdown, active actors. Export to PDF.", icon: Sparkles, href: "/briefing", keywords: "executive summary report pdf export board leadership" },
   { category: "page", title: "Timeline", description: "Chronological view of all threats grouped by date. Filter by severity. See attack progression over time.", icon: Clock, href: "/timeline", keywords: "chronological date history progression" },
   { category: "page", title: "Zero-Day Tracker", description: "Dedicated tracker for actively exploited zero-day vulnerabilities. Shows affected products, CVEs, and recent activity.", icon: Bug, href: "/zero-days", keywords: "zero day 0day exploited active exploitation" },

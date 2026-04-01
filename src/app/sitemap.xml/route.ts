@@ -4,7 +4,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.ap
 
 const STATIC_PAGES = [
   { path: "", priority: "1.0", changefreq: "hourly" },
-  { path: "/dashboard", priority: "0.9", changefreq: "hourly" },
+  { path: "/intelligence", priority: "0.9", changefreq: "hourly" },
   { path: "/briefing", priority: "0.9", changefreq: "daily" },
   { path: "/timeline", priority: "0.8", changefreq: "hourly" },
   { path: "/zero-days", priority: "0.9", changefreq: "hourly" },

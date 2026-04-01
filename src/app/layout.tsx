@@ -109,7 +109,7 @@ export default function RootLayout({
                     Intelligence
                   </h4>
                   <ul className="mt-3 space-y-2 text-sm">
-                    <li><a href="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">Dashboard</a></li>
+                    <li><a href="/intelligence" className="text-muted-foreground hover:text-foreground transition-colors">Intelligence</a></li>
                     <li><a href="/cve" className="text-muted-foreground hover:text-foreground transition-colors">CVE Search</a></li>
                     <li><a href="/threat-actors" className="text-muted-foreground hover:text-foreground transition-colors">Threat Actors</a></li>
                   </ul>

@@ -111,7 +111,7 @@ function buildEmailHtml(articles: DigestArticle[], date: string) {
 
 <!-- Footer -->
 <tr><td style="padding:16px 24px;border-top:1px solid #1e293b;text-align:center">
-  <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.app"}/dashboard" style="color:#3b82f6;text-decoration:none;font-size:13px;font-weight:600">Open Full Dashboard →</a>
+  <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.app"}/intelligence" style="color:#3b82f6;text-decoration:none;font-size:13px;font-weight:600">Open Full Dashboard →</a>
   <br/>
   <span style="font-size:11px;color:#475569;line-height:2">CyberIntel — Institutional Cybersecurity Intelligence</span>
 </td></tr>

@@ -59,7 +59,7 @@ export async function sendSlackAlert(articles: SlackArticle[]) {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `_+${urgent.length - 5} more — <${appUrl}/dashboard|View Dashboard>_`,
+        text: `_+${urgent.length - 5} more — <${appUrl}/intelligence|View Dashboard>_`,
       },
     });
   }
@@ -70,7 +70,7 @@ export async function sendSlackAlert(articles: SlackArticle[]) {
       {
         type: "button",
         text: { type: "plain_text", text: "Open Dashboard" },
-        url: `${appUrl}/dashboard`,
+        url: `${appUrl}/intelligence`,
       },
       {
         type: "button",

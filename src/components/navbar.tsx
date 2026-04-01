@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 
 const primaryNav = [
-  { name: "Dashboard", href: "/dashboard" },
+  { name: "Intelligence", href: "/intelligence" },
   { name: "Briefing", href: "/briefing" },
   { name: "Zero-Days", href: "/zero-days" },
   { name: "CVEs", href: "/cve" },
@@ -53,7 +53,7 @@ const moreNav = [
 ];
 
 const allNav = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Intelligence", href: "/intelligence", icon: LayoutDashboard },
   { name: "Briefing", href: "/briefing", icon: Sparkles },
   { name: "Timeline", href: "/timeline", icon: Clock },
   { name: "Zero-Days", href: "/zero-days", icon: Bug },

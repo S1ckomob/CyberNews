@@ -121,7 +121,7 @@ export default async function HomePage() {
                 <h2 className="text-xs font-bold uppercase tracking-widest">Latest Intelligence</h2>
               {articles[0] && <FreshnessBadge latestPublishedAt={articles[0].publishedAt} />}
               </div>
-              <Link href="/dashboard">
+              <Link href="/intelligence">
                 <Button variant="ghost" size="sm" className="gap-1 text-xs h-6">
                   All {articles.length}+ <ArrowRight className="h-3 w-3" />
                 </Button>

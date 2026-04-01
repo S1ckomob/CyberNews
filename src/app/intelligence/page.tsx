@@ -141,9 +141,9 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Intelligence Dashboard</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Intelligence Feed</h1>
           <p className="text-sm text-muted-foreground">
-            Real-time threat intelligence feed
+            All threat intelligence — search, filter, and monitor
             {lastUpdated && (
               <span className="ml-2 text-xs">
                 &middot; Updated {lastUpdated.toLocaleTimeString()}

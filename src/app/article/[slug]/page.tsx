@@ -163,10 +163,10 @@ export default async function ArticlePage({
         </Link>
         <ChevronRight className="h-3 w-3" />
         <Link
-          href="/dashboard"
+          href="/intelligence"
           className="hover:text-foreground transition-colors"
         >
-          Dashboard
+          Intelligence
         </Link>
         <ChevronRight className="h-3 w-3" />
         <span className="text-foreground truncate max-w-xs">{article.title}</span>

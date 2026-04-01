@@ -36,7 +36,7 @@ interface SearchResults {
 }
 
 const PAGES = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Intelligence Feed", href: "/intelligence", icon: LayoutDashboard },
   { name: "Daily Briefing", href: "/briefing", icon: Sparkles },
   { name: "Zero-Day Tracker", href: "/zero-days", icon: Bug },
   { name: "Ransomware Tracker", href: "/ransomware", icon: Lock },
