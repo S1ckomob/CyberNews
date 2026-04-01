@@ -341,8 +341,8 @@ export async function POST(request: NextRequest) {
   // Auth: accept Bearer token, Vercel CRON_SECRET, or skip if no key configured
   const authHeader = request.headers.get("authorization");
   const cronSecret = request.headers.get("x-vercel-cron-secret");
-  const apiKey = process.env.INGEST_API_KEY;
-  const vercelCronSecret = process.env.CRON_SECRET;
+  const apiKey = process.env.INGEST_API_KEY?.trim();
+  const vercelCronSecret = process.env.CRON_SECRET?.trim();
 
   const isAuthed =
     !apiKey ||
