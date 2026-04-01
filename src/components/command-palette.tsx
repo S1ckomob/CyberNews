@@ -45,7 +45,10 @@ const PAGES = [
   { name: "CVE Search", href: "/cve", icon: Search },
   { name: "Threat Actors", href: "/threat-actors", icon: Users },
   { name: "Timeline", href: "/timeline", icon: Clock },
+  { name: "Trends & Analytics", href: "/trends", icon: Clock },
   { name: "My Watchlist", href: "/watchlist", icon: Eye },
+  { name: "Saved Articles", href: "/saved", icon: FileText },
+  { name: "Help & Navigation", href: "/help", icon: AlertTriangle },
   { name: "Admin Panel", href: "/admin", icon: FileText },
 ];
 

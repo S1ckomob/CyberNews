@@ -27,6 +27,7 @@ import {
   Building2,
   Bookmark,
   TrendingUp,
+  HelpCircle,
 } from "lucide-react";
 
 const primaryNav = [
@@ -46,6 +47,7 @@ const moreNav = [
   { name: "Industries", href: "/industry", icon: Building2 },
   { name: "Watchlist", href: "/watchlist", icon: Eye },
   { name: "Saved", href: "/saved", icon: Bookmark },
+  { name: "Help", href: "/help", icon: HelpCircle },
   { name: "About", href: "/about", icon: Sparkles },
 ];
 
@@ -62,6 +64,7 @@ const allNav = [
   { name: "Industries", href: "/industry", icon: Building2 },
   { name: "Watchlist", href: "/watchlist", icon: Eye },
   { name: "Saved", href: "/saved", icon: Bookmark },
+  { name: "Help", href: "/help", icon: HelpCircle },
   { name: "About", href: "/about", icon: Sparkles },
 ];
 
