@@ -23,6 +23,7 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Zero-Days", href: "/zero-days", icon: Bug },
   { name: "Windows", href: "/windows", icon: Monitor },
+  { name: "Fortinet", href: "/fortinet", icon: Shield },
   { name: "CVEs", href: "/cve", icon: Search },
   { name: "Threat Actors", href: "/threat-actors", icon: Users },
   { name: "Industries", href: "/industry", icon: Building2 },
