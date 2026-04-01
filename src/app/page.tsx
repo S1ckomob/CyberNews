@@ -15,11 +15,18 @@ import {
   TrendingUp,
   AlertTriangle,
   LayoutDashboard,
+  Bug,
 } from "lucide-react";
 
 export default async function HomePage() {
   const articles = await fetchArticles();
   const criticalArticles = articles.filter((a) => a.threatLevel === "critical");
+  const zeroDays = articles.filter(
+    (a) =>
+      a.category === "zero-day" ||
+      a.tags.some((t) => t.includes("zero-day") || t.includes("0-day")) ||
+      a.exploitedAt
+  );
   const featured = criticalArticles[0];
   const trendingTags = [
     "zero-day", "ransomware", "critical-infrastructure", "supply-chain",
@@ -74,6 +81,31 @@ export default async function HomePage() {
 
       {/* Stats */}
       <StatsBar />
+
+      {/* Zero-Day Alert Banner */}
+      {zeroDays.length > 0 && (
+        <section className="border-b border-threat-critical/20 bg-threat-critical/5">
+          <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Bug className="h-4 w-4 text-threat-critical animate-threat-pulse" />
+                <span className="text-xs font-semibold uppercase tracking-wider text-threat-critical">
+                  {zeroDays.length} Active Zero-Day{zeroDays.length !== 1 ? "s" : ""}
+                </span>
+                <span className="hidden sm:inline text-xs text-muted-foreground">
+                  — {zeroDays.slice(0, 2).map((a) => a.title.slice(0, 50)).join(" | ")}
+                  {zeroDays.length > 2 ? "..." : ""}
+                </span>
+              </div>
+              <Link href="/zero-days">
+                <Button variant="ghost" size="sm" className="gap-1 text-xs text-threat-critical hover:text-threat-critical">
+                  View all <ArrowRight className="h-3 w-3" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Featured + Latest side by side */}
       <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">

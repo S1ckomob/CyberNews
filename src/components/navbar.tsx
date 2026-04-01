@@ -13,13 +13,17 @@ import {
   Users,
   Search,
   Building2,
+  Monitor,
+  Bug,
   Menu,
   X,
 } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "CVE Search", href: "/cve", icon: Search },
+  { name: "Zero-Days", href: "/zero-days", icon: Bug },
+  { name: "Windows", href: "/windows", icon: Monitor },
+  { name: "CVEs", href: "/cve", icon: Search },
   { name: "Threat Actors", href: "/threat-actors", icon: Users },
   { name: "Industries", href: "/industry", icon: Building2 },
 ];
