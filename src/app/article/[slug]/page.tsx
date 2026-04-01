@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { ThreatBadge } from "@/components/threat-badge";
 import { ArticleCard } from "@/components/article-card";
 import { ArticleActions } from "@/components/article-actions";
+import { IOCPanel } from "@/components/ioc-panel";
 import {
   fetchArticles,
   fetchArticleBySlug,
@@ -236,6 +237,9 @@ export default async function ArticlePage({
               </div>
             </div>
           )}
+
+          {/* IOCs */}
+          <IOCPanel content={`${article.summary} ${article.content}`} cves={article.cves} />
 
           {/* Source Attribution */}
           <Card className="bg-muted/30">
