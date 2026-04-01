@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { getSupabase } from "./supabase";
 import type { Article, ThreatActor } from "./types";
 import type { ArticleRow, ThreatActorRow } from "./supabase";
 
@@ -45,7 +45,7 @@ function rowToThreatActor(row: ThreatActorRow): ThreatActor {
 }
 
 export async function fetchArticles(): Promise<Article[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("articles")
     .select("*")
     .order("published_at", { ascending: false });
@@ -60,7 +60,7 @@ export async function fetchArticles(): Promise<Article[]> {
 export async function fetchArticleBySlug(
   slug: string
 ): Promise<Article | null> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("articles")
     .select("*")
     .eq("slug", slug)
@@ -73,7 +73,7 @@ export async function fetchArticleBySlug(
 export async function fetchArticlesByIndustry(
   industry: string
 ): Promise<Article[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("articles")
     .select("*")
     .contains("industries", [industry])
@@ -84,7 +84,7 @@ export async function fetchArticlesByIndustry(
 }
 
 export async function fetchThreatActors(): Promise<ThreatActor[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("threat_actors")
     .select("*")
     .order("last_active", { ascending: false });
@@ -96,7 +96,7 @@ export async function fetchThreatActors(): Promise<ThreatActor[]> {
 export async function fetchThreatActorById(
   id: string
 ): Promise<ThreatActor | null> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("threat_actors")
     .select("*")
     .eq("id", id)
@@ -107,7 +107,7 @@ export async function fetchThreatActorById(
 }
 
 export async function fetchArticleSlugs(): Promise<string[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("articles")
     .select("slug");
 
@@ -116,7 +116,7 @@ export async function fetchArticleSlugs(): Promise<string[]> {
 }
 
 export async function fetchThreatActorIds(): Promise<string[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("threat_actors")
     .select("id");
 
