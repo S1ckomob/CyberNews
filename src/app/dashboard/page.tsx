@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ArticleCard } from "@/components/article-card";
 import { ThreatBadge } from "@/components/threat-badge";
-import { articles } from "@/lib/data";
-import type { ThreatLevel, Category, Industry } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
+import type { Article, ThreatLevel, Category, Industry } from "@/lib/types";
+import type { ArticleRow } from "@/lib/supabase";
 import {
   Search,
   SlidersHorizontal,
@@ -19,6 +20,34 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+function rowToArticle(row: ArticleRow): Article {
+  return {
+    id: row.id,
+    title: row.title,
+    slug: row.slug,
+    summary: row.summary,
+    content: row.content,
+    threatLevel: row.threat_level,
+    category: row.category as Article["category"],
+    cves: row.cves,
+    affectedProducts: row.affected_products,
+    threatActors: row.threat_actors,
+    industries: row.industries as Article["industries"],
+    attackVector: row.attack_vector,
+    source: row.source,
+    sourceUrl: row.source_url,
+    publishedAt: row.published_at,
+    updatedAt: row.updated_at,
+    discoveredAt: row.discovered_at ?? "",
+    exploitedAt: row.exploited_at ?? undefined,
+    patchedAt: row.patched_at ?? undefined,
+    verified: row.verified,
+    verifiedBy: row.verified_by,
+    tags: row.tags,
+    region: row.region,
+  };
+}
 
 const THREAT_LEVELS: ThreatLevel[] = ["critical", "high", "medium", "low"];
 const CATEGORIES: { value: Category; label: string }[] = [
@@ -46,11 +75,41 @@ const INDUSTRIES: { value: Industry; label: string }[] = [
 ];
 
 export default function DashboardPage() {
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [threatFilters, setThreatFilters] = useState<ThreatLevel[]>([]);
   const [categoryFilters, setCategoryFilters] = useState<Category[]>([]);
   const [industryFilters, setIndustryFilters] = useState<Industry[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase
+        .from("articles")
+        .select("*")
+        .order("published_at", { ascending: false });
+      if (data) setArticles(data.map(rowToArticle));
+      setLoading(false);
+    }
+    load();
+
+    // Realtime subscription
+    const channel = supabase
+      .channel("articles-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "articles" },
+        () => {
+          load();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const filteredArticles = useMemo(() => {
     let result = articles;
@@ -80,7 +139,7 @@ export default function DashboardPage() {
     }
 
     return result;
-  }, [search, threatFilters, categoryFilters, industryFilters]);
+  }, [articles, search, threatFilters, categoryFilters, industryFilters]);
 
   const activeFilterCount =
     threatFilters.length + categoryFilters.length + industryFilters.length;
@@ -95,8 +154,6 @@ export default function DashboardPage() {
     setIndustryFilters([]);
     setSearch("");
   }
-
-  const trendingArticles = articles.slice(0, 5);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -158,7 +215,6 @@ export default function DashboardPage() {
       {showFilters && (
         <Card className="mb-6">
           <CardContent className="p-4 space-y-4">
-            {/* Threat Level */}
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                 Threat Level
@@ -182,7 +238,6 @@ export default function DashboardPage() {
                 ))}
               </div>
             </div>
-            {/* Category */}
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                 Category
@@ -207,7 +262,6 @@ export default function DashboardPage() {
                 ))}
               </div>
             </div>
-            {/* Industry */}
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                 Industry
@@ -241,10 +295,16 @@ export default function DashboardPage() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-muted-foreground">
-              {filteredArticles.length} {filteredArticles.length === 1 ? "result" : "results"}
+              {loading ? "Loading..." : `${filteredArticles.length} ${filteredArticles.length === 1 ? "result" : "results"}`}
             </h2>
           </div>
-          {filteredArticles.length === 0 ? (
+          {loading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-40 w-full rounded-lg" />
+              ))}
+            </div>
+          ) : filteredArticles.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                 <Search className="h-8 w-8 text-muted-foreground mb-3" />
@@ -265,7 +325,6 @@ export default function DashboardPage() {
 
         {/* Sidebar */}
         <aside className="space-y-6">
-          {/* Critical Alerts */}
           <Card className="border-threat-critical/20">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-3">
@@ -289,7 +348,6 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Trending */}
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-3">
@@ -299,7 +357,7 @@ export default function DashboardPage() {
                 </h3>
               </div>
               <div className="space-y-1">
-                {trendingArticles.map((article) => (
+                {articles.slice(0, 5).map((article) => (
                   <ArticleCard
                     key={article.id}
                     article={article}
@@ -310,7 +368,6 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Recent Activity */}
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-3">

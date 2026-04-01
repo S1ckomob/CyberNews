@@ -1,23 +1,54 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ThreatBadge } from "@/components/threat-badge";
-import { articles } from "@/lib/data";
+import { supabase } from "@/lib/supabase";
+import type { Article } from "@/lib/types";
+import type { ArticleRow } from "@/lib/supabase";
 import { Search, Tag, AlertTriangle, ExternalLink, Box } from "lucide-react";
+
+function rowToArticle(row: ArticleRow): Article {
+  return {
+    id: row.id, title: row.title, slug: row.slug, summary: row.summary,
+    content: row.content, threatLevel: row.threat_level,
+    category: row.category as Article["category"], cves: row.cves,
+    affectedProducts: row.affected_products, threatActors: row.threat_actors,
+    industries: row.industries as Article["industries"],
+    attackVector: row.attack_vector, source: row.source, sourceUrl: row.source_url,
+    publishedAt: row.published_at, updatedAt: row.updated_at,
+    discoveredAt: row.discovered_at ?? "", exploitedAt: row.exploited_at ?? undefined,
+    patchedAt: row.patched_at ?? undefined, verified: row.verified,
+    verifiedBy: row.verified_by, tags: row.tags, region: row.region,
+  };
+}
 
 interface CveEntry {
   cve: string;
-  articles: typeof articles;
-  highestThreat: (typeof articles)[0]["threatLevel"];
+  articles: Article[];
+  highestThreat: Article["threatLevel"];
   products: string[];
 }
 
 export default function CvePage() {
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    supabase
+      .from("articles")
+      .select("*")
+      .order("published_at", { ascending: false })
+      .then(({ data }) => {
+        if (data) setArticles(data.map(rowToArticle));
+        setLoading(false);
+      });
+  }, []);
 
   const cveMap = useMemo(() => {
     const map = new Map<string, CveEntry>();

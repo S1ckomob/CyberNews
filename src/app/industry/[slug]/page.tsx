@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArticleCard } from "@/components/article-card";
-import { articles, getArticlesByIndustry } from "@/lib/data";
+import { fetchArticlesByIndustry } from "@/lib/queries";
 import type { Industry } from "@/lib/types";
 import type { Metadata } from "next";
 import { Building2, ChevronRight, AlertTriangle, Shield } from "lucide-react";
@@ -89,7 +89,7 @@ export default async function IndustryPage({
   const industry = INDUSTRIES[slug as Industry];
   if (!industry) notFound();
 
-  const industryArticles = getArticlesByIndustry(slug);
+  const industryArticles = await fetchArticlesByIndustry(slug);
   const criticalCount = industryArticles.filter(
     (a) => a.threatLevel === "critical"
   ).length;

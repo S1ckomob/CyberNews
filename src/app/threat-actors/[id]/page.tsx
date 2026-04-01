@@ -4,7 +4,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ArticleCard } from "@/components/article-card";
-import { threatActors, getThreatActorById, articles } from "@/lib/data";
+import {
+  fetchThreatActors,
+  fetchThreatActorById,
+  fetchThreatActorIds,
+  fetchArticles,
+} from "@/lib/queries";
 import type { Metadata } from "next";
 import {
   Users,
@@ -18,7 +23,8 @@ import {
 } from "lucide-react";
 
 export async function generateStaticParams() {
-  return threatActors.map((actor) => ({ id: actor.id }));
+  const ids = await fetchThreatActorIds();
+  return ids.map((id) => ({ id }));
 }
 
 export async function generateMetadata({
@@ -27,7 +33,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const actor = getThreatActorById(id);
+  const actor = await fetchThreatActorById(id);
   if (!actor) return { title: "Not Found" };
   return {
     title: `${actor.name} — Threat Actor Profile`,
@@ -41,9 +47,10 @@ export default async function ThreatActorPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const actor = getThreatActorById(id);
+  const actor = await fetchThreatActorById(id);
   if (!actor) notFound();
 
+  const articles = await fetchArticles();
   const relatedArticles = articles.filter((a) =>
     a.threatActors.some(
       (t) => t === actor.name || actor.aliases.includes(t)

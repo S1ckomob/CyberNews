@@ -6,7 +6,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ThreatBadge } from "@/components/threat-badge";
 import { ArticleCard } from "@/components/article-card";
-import { articles, getArticleBySlug, threatActors } from "@/lib/data";
+import {
+  fetchArticles,
+  fetchArticleBySlug,
+  fetchThreatActors,
+  fetchArticleSlugs,
+} from "@/lib/queries";
 import type { Metadata } from "next";
 import {
   Shield,
@@ -47,9 +52,8 @@ function formatShortDate(dateString: string) {
 }
 
 export async function generateStaticParams() {
-  return articles.map((article) => ({
-    slug: article.slug,
-  }));
+  const slugs = await fetchArticleSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -58,7 +62,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const article = getArticleBySlug(slug);
+  const article = await fetchArticleBySlug(slug);
   if (!article) return { title: "Not Found" };
   return {
     title: article.title,
@@ -80,9 +84,10 @@ export default async function ArticlePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const article = getArticleBySlug(slug);
+  const article = await fetchArticleBySlug(slug);
   if (!article) notFound();
 
+  const articles = await fetchArticles();
   const relatedArticles = articles
     .filter(
       (a) =>
@@ -96,6 +101,7 @@ export default async function ArticlePage({
     )
     .slice(0, 3);
 
+  const threatActors = await fetchThreatActors();
   const linkedActors = threatActors.filter((a) =>
     article.threatActors.some(
       (name) =>

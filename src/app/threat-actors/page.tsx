@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { threatActors, articles } from "@/lib/data";
+import { fetchThreatActors, fetchArticles } from "@/lib/queries";
 import { Users, Globe, Calendar, Target, ChevronRight } from "lucide-react";
 
 export const metadata = {
@@ -10,7 +10,10 @@ export const metadata = {
     "Profiles of active threat actors tracked by CyberIntel intelligence analysts.",
 };
 
-export default function ThreatActorsPage() {
+export default async function ThreatActorsPage() {
+  const threatActors = await fetchThreatActors();
+  const articles = await fetchArticles();
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <div className="mb-6">

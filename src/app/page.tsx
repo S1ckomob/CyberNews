@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ArticleCard } from "@/components/article-card";
 import { StatsBar } from "@/components/stats-bar";
-import { articles } from "@/lib/data";
+import { fetchArticles } from "@/lib/queries";
 import {
   Shield,
   ArrowRight,
@@ -18,7 +18,8 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const articles = await fetchArticles();
   const criticalArticles = articles.filter((a) => a.threatLevel === "critical");
   const featured = criticalArticles[0];
   const trendingTags = ["zero-day", "ransomware", "critical-infrastructure", "supply-chain", "state-sponsored"];

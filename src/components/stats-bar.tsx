@@ -1,6 +1,7 @@
-import { articles } from "@/lib/data";
+import { fetchArticles } from "@/lib/queries";
 
-export function StatsBar() {
+export async function StatsBar() {
+  const articles = await fetchArticles();
   const criticalCount = articles.filter((a) => a.threatLevel === "critical").length;
   const highCount = articles.filter((a) => a.threatLevel === "high").length;
   const allCves = new Set(articles.flatMap((a) => a.cves));

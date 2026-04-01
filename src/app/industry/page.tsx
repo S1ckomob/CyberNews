@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { articles } from "@/lib/data";
+import { fetchArticles } from "@/lib/queries";
 import type { Industry } from "@/lib/types";
 import { Building2, ChevronRight, AlertTriangle } from "lucide-react";
 
@@ -28,7 +28,9 @@ const INDUSTRIES: {
   { value: "manufacturing", label: "Manufacturing", icon: "🏭" },
 ];
 
-export default function IndustriesPage() {
+export default async function IndustriesPage() {
+  const articles = await fetchArticles();
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <div className="mb-6">
