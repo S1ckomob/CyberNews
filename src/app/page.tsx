@@ -32,8 +32,32 @@ export default async function HomePage() {
       a.exploitedAt
   );
 
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.app";
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "CyberIntel",
+    url: siteUrl,
+    description: "The institutional standard for cybersecurity intelligence.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/cve?q={search_term_string}` },
+      "query-input": "required name=search_term_string",
+    },
+  };
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "CyberIntel",
+    url: siteUrl,
+    description: "Institutional cybersecurity threat intelligence platform.",
+    sameAs: [],
+  };
+
   return (
     <div className="flex flex-col">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
       {/* Global Threat Level */}
       <ThreatLevelIndicator articles={articles} />
 

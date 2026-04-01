@@ -18,7 +18,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "CyberIntel | Institutional Cybersecurity Intelligence",
     template: "%s | CyberIntel",
@@ -26,33 +29,43 @@ export const metadata: Metadata = {
   description:
     "The institutional standard for cybersecurity intelligence. Real-time threat data, verified sources, and actionable intelligence for security teams.",
   keywords: [
-    "cybersecurity",
-    "threat intelligence",
-    "CVE",
-    "vulnerability",
-    "security",
-    "CISO",
-    "threat actors",
-    "ransomware",
-    "APT",
+    "cybersecurity", "threat intelligence", "CVE", "vulnerability", "security",
+    "CISO", "threat actors", "ransomware", "APT", "zero-day", "malware",
+    "incident response", "MITRE ATT&CK", "CVSS", "NVD", "CISA",
+    "SOC", "security operations", "cyber threat", "exploit",
   ],
+  authors: [{ name: "CyberIntel", url: siteUrl }],
+  creator: "CyberIntel",
+  publisher: "CyberIntel",
+  formatDetection: { telephone: false, email: false },
   openGraph: {
     type: "website",
     locale: "en_US",
     siteName: "CyberIntel",
     title: "CyberIntel | Institutional Cybersecurity Intelligence",
-    description:
-      "Real-time threat data. Verified sources. Actionable intelligence.",
+    description: "Real-time threat data. Verified sources. Actionable intelligence.",
+    url: siteUrl,
   },
   twitter: {
     card: "summary_large_image",
     title: "CyberIntel",
-    description:
-      "The institutional standard for cybersecurity intelligence.",
+    description: "The institutional standard for cybersecurity intelligence.",
   },
   alternates: {
+    canonical: siteUrl,
     types: {
       "application/rss+xml": "/feed.xml",
+    },
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
 };

@@ -188,10 +188,10 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
               ))}
             </div>
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
+              <time dateTime={article.publishedAt} className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
                 {formatDate(article.publishedAt)}
-              </span>
+              </time>
               <span className="flex items-center gap-1.5">
                 <span className="font-mono text-[10px]">{article.source}</span>
                 {article.sourceUrl && (

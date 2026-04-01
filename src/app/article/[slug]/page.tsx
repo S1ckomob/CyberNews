@@ -78,11 +78,13 @@ export async function generateMetadata({
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt,
       tags: article.tags,
+      images: [{ url: `${siteUrl}/og/${slug}`, width: 1200, height: 630, alt: article.title }],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: `${article.threatLevel.toUpperCase()}: ${article.title}`,
       description: article.summary,
+      images: [`${siteUrl}/og/${slug}`],
     },
   };
 }
