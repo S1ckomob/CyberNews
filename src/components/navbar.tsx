@@ -5,27 +5,47 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { NotificationManager } from "@/components/notification-manager";
 import { useCommandPalette } from "@/lib/command-palette-context";
 import {
   Shield,
-  LayoutDashboard,
-  Users,
   Search,
-  Building2,
-  Monitor,
-  Bug,
-  Lock,
-  Sparkles,
-  Eye,
-  Clock,
+  ChevronDown,
   Menu,
   X,
+  LayoutDashboard,
+  Sparkles,
+  Clock,
+  Bug,
+  Lock,
+  Monitor,
+  Eye,
+  Users,
+  Building2,
 } from "lucide-react";
 
-const navigation = [
+const primaryNav = [
+  { name: "Dashboard", href: "/dashboard" },
+  { name: "Briefing", href: "/briefing" },
+  { name: "Zero-Days", href: "/zero-days" },
+  { name: "CVEs", href: "/cve" },
+];
+
+const moreNav = [
+  { name: "Timeline", href: "/timeline", icon: Clock },
+  { name: "Ransomware", href: "/ransomware", icon: Lock },
+  { name: "Firewalls", href: "/firewalls", icon: Shield },
+  { name: "Windows", href: "/windows", icon: Monitor },
+  { name: "Threat Actors", href: "/threat-actors", icon: Users },
+  { name: "Industries", href: "/industry", icon: Building2 },
+  { name: "Watchlist", href: "/watchlist", icon: Eye },
+  { name: "About", href: "/about", icon: Sparkles },
+];
+
+const allNav = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Briefing", href: "/briefing", icon: Sparkles },
   { name: "Timeline", href: "/timeline", icon: Clock },
@@ -34,26 +54,34 @@ const navigation = [
   { name: "Firewalls", href: "/firewalls", icon: Shield },
   { name: "Windows", href: "/windows", icon: Monitor },
   { name: "CVEs", href: "/cve", icon: Search },
-  { name: "Actors", href: "/threat-actors", icon: Users },
+  { name: "Threat Actors", href: "/threat-actors", icon: Users },
+  { name: "Industries", href: "/industry", icon: Building2 },
   { name: "Watchlist", href: "/watchlist", icon: Eye },
+  { name: "About", href: "/about", icon: Sparkles },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const { setOpen: setCommandOpen } = useCommandPalette();
+
+  const isMoreActive = moreNav.some(
+    (item) => pathname === item.href || pathname.startsWith(item.href + "/")
+  );
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2.5">
-          <Shield className="h-5 w-5 text-primary" />
+      <div className="mx-auto flex h-12 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 shrink-0">
+          <Shield className="h-4 w-4 text-primary" />
           <span className="text-sm font-bold tracking-tight">CyberIntel</span>
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 md:flex">
-          {navigation.map((item) => {
+        {/* Desktop nav — clean text links */}
+        <nav className="hidden items-center gap-0.5 lg:flex">
+          {primaryNav.map((item) => {
             const isActive =
               pathname === item.href || pathname.startsWith(item.href + "/");
             return (
@@ -61,85 +89,116 @@ export function Navbar() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors",
+                  "rounded-md px-2.5 py-1 text-[13px] font-medium transition-colors",
                   isActive
                     ? "bg-accent text-foreground"
-                    : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <item.icon className="h-3.5 w-3.5" />
                 {item.name}
               </Link>
             );
           })}
-        </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <button
-            onClick={() => setCommandOpen(true)}
-            className="flex items-center gap-2 rounded-md border border-input bg-card px-3 py-1 text-xs text-muted-foreground hover:bg-accent transition-colors"
-          >
-            <Search className="h-3 w-3" />
-            <span>Search...</span>
-            <kbd className="ml-2 rounded bg-muted px-1.5 py-0.5 font-mono text-[10px]">⌘K</kbd>
-          </button>
-          <div className="flex items-center gap-1.5 rounded-full bg-threat-critical/10 px-2.5 py-1 text-xs font-medium text-threat-critical">
-            <span className="h-1.5 w-1.5 rounded-full bg-threat-critical animate-threat-pulse" />
-            LIVE
-          </div>
-          <NotificationManager />
-          <ThemeToggle />
-          <Link href="/about">
-            <Button variant="outline" size="sm" className="text-xs">
-              About
-            </Button>
-          </Link>
-        </div>
-
-        {/* Mobile nav */}
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger
-            className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-          >
-            {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </SheetTrigger>
-          <SheetContent side="right" className="w-72">
-            <SheetTitle className="sr-only">Navigation</SheetTitle>
-            <nav className="mt-6 flex flex-col gap-1">
-              {navigation.map((item) => {
+          {/* More dropdown */}
+          <Popover open={moreOpen} onOpenChange={setMoreOpen}>
+            <PopoverTrigger
+              className={cn(
+                "flex items-center gap-1 rounded-md px-2.5 py-1 text-[13px] font-medium transition-colors",
+                isMoreActive
+                  ? "bg-accent text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              More
+              <ChevronDown className="h-3 w-3" />
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-48 p-1">
+              {moreNav.map((item) => {
                 const isActive =
-                  pathname === item.href ||
-                  pathname.startsWith(item.href + "/");
+                  pathname === item.href || pathname.startsWith(item.href + "/");
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
-                    onClick={() => setOpen(false)}
+                    onClick={() => setMoreOpen(false)}
                     className={cn(
-                      "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
+                      "flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm transition-colors",
                       isActive
                         ? "bg-accent text-foreground"
                         : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
                     )}
                   >
-                    <item.icon className="h-4 w-4" />
+                    <item.icon className="h-3.5 w-3.5" />
                     {item.name}
                   </Link>
                 );
               })}
-              <Link
-                href="/about"
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-colors"
-              >
-                About
-              </Link>
-              <div className="mt-4 px-3">
-                <ThemeToggle />
-              </div>
-            </nav>
-          </SheetContent>
-        </Sheet>
+            </PopoverContent>
+          </Popover>
+        </nav>
+
+        {/* Right side — search, live, controls */}
+        <div className="hidden items-center gap-2 lg:flex">
+          <button
+            onClick={() => setCommandOpen(true)}
+            className="flex items-center gap-2 rounded-md border border-input bg-card px-2.5 py-1 text-xs text-muted-foreground hover:bg-accent transition-colors"
+          >
+            <Search className="h-3 w-3" />
+            <span className="hidden xl:inline">Search</span>
+            <kbd className="rounded bg-muted px-1 py-0.5 font-mono text-[10px]">⌘K</kbd>
+          </button>
+          <div className="flex items-center gap-1.5 rounded-full bg-threat-critical/10 px-2 py-0.5 text-[10px] font-bold text-threat-critical">
+            <span className="h-1.5 w-1.5 rounded-full bg-threat-critical animate-threat-pulse" />
+            LIVE
+          </div>
+          <NotificationManager />
+          <ThemeToggle />
+        </div>
+
+        {/* Mobile */}
+        <div className="flex items-center gap-2 lg:hidden">
+          <button
+            onClick={() => setCommandOpen(true)}
+            className="rounded-md p-1.5 text-muted-foreground hover:bg-accent transition-colors"
+          >
+            <Search className="h-4 w-4" />
+          </button>
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+            <SheetTrigger className="rounded-md p-1.5 text-muted-foreground hover:bg-accent transition-colors">
+              {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            </SheetTrigger>
+            <SheetContent side="right" className="w-64">
+              <SheetTitle className="sr-only">Navigation</SheetTitle>
+              <nav className="mt-6 flex flex-col gap-0.5">
+                {allNav.map((item) => {
+                  const isActive =
+                    pathname === item.href || pathname.startsWith(item.href + "/");
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={cn(
+                        "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
+                        isActive
+                          ? "bg-accent text-foreground"
+                          : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                      )}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+                <div className="mt-4 px-3 flex items-center gap-2">
+                  <ThemeToggle />
+                  <NotificationManager />
+                </div>
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </header>
   );
