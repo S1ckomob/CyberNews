@@ -47,46 +47,50 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* Threat level colors */
-  --color-threat-critical: oklch(0.637 0.237 15.163);
-  --color-threat-high: oklch(0.705 0.213 47.604);
-  --color-threat-medium: oklch(0.795 0.184 86.047);
-  --color-threat-low: oklch(0.556 0 0);
+  /* Threat level colors — adjusted per theme */
+  --color-threat-critical: var(--threat-critical);
+  --color-threat-high: var(--threat-high);
+  --color-threat-medium: var(--threat-medium);
+  --color-threat-low: var(--threat-low);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --background: oklch(0.97 0.005 250);
+  --foreground: oklch(0.15 0.02 260);
+  --card: oklch(0.995 0.002 250);
+  --card-foreground: oklch(0.15 0.02 260);
+  --popover: oklch(0.995 0.002 250);
+  --popover-foreground: oklch(0.15 0.02 260);
+  --primary: oklch(0.45 0.18 255);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.93 0.01 250);
+  --secondary-foreground: oklch(0.2 0.02 260);
+  --muted: oklch(0.93 0.01 250);
+  --muted-foreground: oklch(0.45 0.02 260);
+  --accent: oklch(0.93 0.015 250);
+  --accent-foreground: oklch(0.2 0.02 260);
+  --destructive: oklch(0.55 0.245 27.325);
+  --border: oklch(0.88 0.015 250);
+  --input: oklch(0.91 0.01 250);
+  --ring: oklch(0.45 0.18 255);
+  --chart-1: oklch(0.45 0.18 255);
+  --chart-2: oklch(0.55 0.2 15);
+  --chart-3: oklch(0.6 0.2 47);
+  --chart-4: oklch(0.65 0.2 150);
+  --chart-5: oklch(0.7 0.15 86);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: oklch(0.96 0.008 250);
+  --sidebar-foreground: oklch(0.15 0.02 260);
+  --sidebar-primary: oklch(0.45 0.18 255);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.93 0.015 250);
+  --sidebar-accent-foreground: oklch(0.2 0.02 260);
+  --sidebar-border: oklch(0.88 0.015 250);
+  --sidebar-ring: oklch(0.45 0.18 255);
+  --threat-critical: oklch(0.5 0.25 20);
+  --threat-high: oklch(0.55 0.22 50);
+  --threat-medium: oklch(0.55 0.18 86);
+  --threat-low: oklch(0.45 0.02 260);
 }
 
 .dark {
@@ -121,6 +125,10 @@
   --sidebar-accent-foreground: oklch(0.93 0 0);
   --sidebar-border: oklch(0.25 0.01 260);
   --sidebar-ring: oklch(0.7 0.15 220);
+  --threat-critical: oklch(0.637 0.237 15.163);
+  --threat-high: oklch(0.705 0.213 47.604);
+  --threat-medium: oklch(0.795 0.184 86.047);
+  --threat-low: oklch(0.556 0 0);
 }
 
 @layer base {
@@ -133,6 +141,32 @@
   html {
     @apply font-sans;
   }
+}
+
+/* Light mode card elevation */
+:root [data-slot="card"] {
+  box-shadow: 0 1px 3px oklch(0.3 0.02 260 / 8%), 0 1px 2px oklch(0.3 0.02 260 / 6%);
+}
+
+:root [data-slot="card"]:hover {
+  box-shadow: 0 4px 12px oklch(0.3 0.02 260 / 10%), 0 2px 4px oklch(0.3 0.02 260 / 6%);
+}
+
+.dark [data-slot="card"] {
+  box-shadow: none;
+}
+
+.dark [data-slot="card"]:hover {
+  box-shadow: none;
+}
+
+/* Light mode navbar depth */
+:root header {
+  box-shadow: 0 1px 3px oklch(0.3 0.02 260 / 6%);
+}
+
+.dark header {
+  box-shadow: none;
 }
 
 /* Threat level pulse animation */
