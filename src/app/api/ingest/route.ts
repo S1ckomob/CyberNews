@@ -338,9 +338,18 @@ async function fetchNVDRecent(): Promise<IngestArticle[]> {
 // ---------- Main Handler ----------
 
 export async function POST(request: NextRequest) {
+  // Auth: accept Bearer token, Vercel CRON_SECRET, or skip if no key configured
   const authHeader = request.headers.get("authorization");
+  const cronSecret = request.headers.get("x-vercel-cron-secret");
   const apiKey = process.env.INGEST_API_KEY;
-  if (apiKey && authHeader !== `Bearer ${apiKey}`) {
+  const vercelCronSecret = process.env.CRON_SECRET;
+
+  const isAuthed =
+    !apiKey ||
+    authHeader === `Bearer ${apiKey}` ||
+    (vercelCronSecret && cronSecret === vercelCronSecret);
+
+  if (!isAuthed) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
