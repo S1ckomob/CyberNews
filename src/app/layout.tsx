@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { ThreatTicker } from "@/components/threat-ticker";
 import { ThemeProvider } from "@/components/theme-provider";
+import { CommandPaletteProvider } from "@/lib/command-palette-context";
+import { CommandPalette } from "@/components/command-palette";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
@@ -63,7 +65,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
+        <CommandPaletteProvider>
         <TooltipProvider>
+          <CommandPalette />
           <Navbar />
           <ThreatTicker />
           <main className="flex-1">{children}</main>
@@ -120,6 +124,7 @@ export default function RootLayout({
             </div>
           </footer>
         </TooltipProvider>
+        </CommandPaletteProvider>
         </ThemeProvider>
       </body>
     </html>

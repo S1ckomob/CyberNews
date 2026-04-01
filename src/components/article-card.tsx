@@ -2,14 +2,27 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ThreatBadge } from "@/components/threat-badge";
+import { ExploitStatusBadge } from "@/components/exploit-status-badge";
 import type { Article } from "@/lib/types";
 import {
   Clock,
   Shield,
   Tag,
   Globe,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const BORDER_COLORS: Record<string, string> = {
+  critical: "border-l-[3px] border-l-threat-critical",
+  high: "border-l-[3px] border-l-threat-high",
+  medium: "border-l-[3px] border-l-threat-medium",
+  low: "border-l-[3px] border-l-threat-low",
+};
+
+function isNew(dateString: string): boolean {
+  return Date.now() - new Date(dateString).getTime() < 60 * 60 * 1000;
+}
 
 function formatDate(dateString: string) {
   const date = new Date(dateString);
@@ -97,7 +110,7 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
   if (variant === "compact") {
     return (
       <Link href={`/article/${article.slug}`}>
-        <div className="group flex items-start gap-3 rounded-lg border border-transparent p-3 transition-all hover:border-border hover:bg-card">
+        <div className={cn("group flex items-start gap-3 rounded-lg border border-transparent p-3 transition-all hover:border-border hover:bg-card border-l-2", `border-l-threat-${article.threatLevel}`)}>
           <div className="mt-0.5">
             <ThreatBadge level={article.threatLevel} size="sm" />
           </div>
@@ -121,6 +134,7 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
       <Card
         className={cn(
           "group transition-all hover:shadow-md",
+          BORDER_COLORS[article.threatLevel],
           article.threatLevel === "critical" &&
             "border-threat-critical/20 hover:border-threat-critical/40",
           article.threatLevel === "high" &&
@@ -134,6 +148,12 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
               <Badge variant="outline" className="text-[10px] font-mono">
                 {categoryLabel(article.category)}
               </Badge>
+              {isNew(article.publishedAt) && (
+                <Badge className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0 animate-threat-pulse gap-1">
+                  <Zap className="h-2.5 w-2.5" />NEW
+                </Badge>
+              )}
+              <ExploitStatusBadge article={article} />
               {article.verified && (
                 <div className="flex items-center gap-1 text-[10px] text-primary">
                   <Shield className="h-3 w-3" />

@@ -57,6 +57,17 @@ export async function fetchArticles(): Promise<Article[]> {
   return data.map(rowToArticle);
 }
 
+export async function fetchArticlesLimited(limit = 30): Promise<Article[]> {
+  const { data, error } = await getSupabase()
+    .from("articles")
+    .select("*")
+    .order("published_at", { ascending: false })
+    .limit(limit);
+
+  if (error) return [];
+  return data.map(rowToArticle);
+}
+
 export async function fetchArticleBySlug(
   slug: string
 ): Promise<Article | null> {

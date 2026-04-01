@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { NotificationManager } from "@/components/notification-manager";
+import { useCommandPalette } from "@/lib/command-palette-context";
 import {
   Shield,
   LayoutDashboard,
@@ -19,6 +20,7 @@ import {
   Lock,
   Sparkles,
   Eye,
+  Clock,
   Menu,
   X,
 } from "lucide-react";
@@ -26,6 +28,7 @@ import {
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Briefing", href: "/briefing", icon: Sparkles },
+  { name: "Timeline", href: "/timeline", icon: Clock },
   { name: "Zero-Days", href: "/zero-days", icon: Bug },
   { name: "Ransomware", href: "/ransomware", icon: Lock },
   { name: "Firewalls", href: "/firewalls", icon: Shield },
@@ -38,6 +41,7 @@ const navigation = [
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { setOpen: setCommandOpen } = useCommandPalette();
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -71,6 +75,14 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
+          <button
+            onClick={() => setCommandOpen(true)}
+            className="flex items-center gap-2 rounded-md border border-input bg-card px-3 py-1 text-xs text-muted-foreground hover:bg-accent transition-colors"
+          >
+            <Search className="h-3 w-3" />
+            <span>Search...</span>
+            <kbd className="ml-2 rounded bg-muted px-1.5 py-0.5 font-mono text-[10px]">⌘K</kbd>
+          </button>
           <div className="flex items-center gap-1.5 rounded-full bg-threat-critical/10 px-2.5 py-1 text-xs font-medium text-threat-critical">
             <span className="h-1.5 w-1.5 rounded-full bg-threat-critical animate-threat-pulse" />
             LIVE

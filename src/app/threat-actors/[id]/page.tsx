@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ArticleCard } from "@/components/article-card";
+import { MitreAttackGrid } from "@/components/mitre-attack-grid";
 import {
   fetchThreatActors,
   fetchThreatActorById,
@@ -98,10 +99,15 @@ export default async function ThreatActorPage({
             <p className="text-sm leading-relaxed">{actor.description}</p>
           </div>
 
+          {/* MITRE ATT&CK Grid */}
+          <MitreAttackGrid ttps={actor.ttps} />
+
+          <Separator />
+
           {/* TTPs */}
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-              Tactics, Techniques & Procedures
+              Raw TTPs
             </h2>
             <div className="flex flex-wrap gap-2">
               {actor.ttps.map((ttp) => (
