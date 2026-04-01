@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArticleCard } from "@/components/article-card";
 import { ThreatBadge } from "@/components/threat-badge";
@@ -18,34 +19,25 @@ import {
   TrendingUp,
   Clock,
   AlertTriangle,
+  Bug,
+  Shield,
+  BarChart3,
+  RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function rowToArticle(row: ArticleRow): Article {
   return {
-    id: row.id,
-    title: row.title,
-    slug: row.slug,
-    summary: row.summary,
-    content: row.content,
-    threatLevel: row.threat_level,
-    category: row.category as Article["category"],
-    cves: row.cves,
-    affectedProducts: row.affected_products,
-    threatActors: row.threat_actors,
+    id: row.id, title: row.title, slug: row.slug, summary: row.summary,
+    content: row.content, threatLevel: row.threat_level,
+    category: row.category as Article["category"], cves: row.cves,
+    affectedProducts: row.affected_products, threatActors: row.threat_actors,
     industries: row.industries as Article["industries"],
-    attackVector: row.attack_vector,
-    source: row.source,
-    sourceUrl: row.source_url,
-    publishedAt: row.published_at,
-    updatedAt: row.updated_at,
-    discoveredAt: row.discovered_at ?? "",
-    exploitedAt: row.exploited_at ?? undefined,
-    patchedAt: row.patched_at ?? undefined,
-    verified: row.verified,
-    verifiedBy: row.verified_by,
-    tags: row.tags,
-    region: row.region,
+    attackVector: row.attack_vector, source: row.source, sourceUrl: row.source_url,
+    publishedAt: row.published_at, updatedAt: row.updated_at,
+    discoveredAt: row.discovered_at ?? "", exploitedAt: row.exploited_at ?? undefined,
+    patchedAt: row.patched_at ?? undefined, verified: row.verified,
+    verifiedBy: row.verified_by, tags: row.tags, region: row.region,
   };
 }
 
@@ -77,95 +69,99 @@ const INDUSTRIES: { value: Industry; label: string }[] = [
 export default function DashboardPage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState("");
   const [threatFilters, setThreatFilters] = useState<ThreatLevel[]>([]);
   const [categoryFilters, setCategoryFilters] = useState<Category[]>([]);
   const [industryFilters, setIndustryFilters] = useState<Industry[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  async function load() {
+    const { data } = await supabase
+      .from("articles")
+      .select("*")
+      .order("published_at", { ascending: false });
+    if (data) setArticles(data.map(rowToArticle));
+    setLoading(false);
+    setRefreshing(false);
+    setLastUpdated(new Date());
+  }
 
   useEffect(() => {
-    async function load() {
-      const { data } = await supabase
-        .from("articles")
-        .select("*")
-        .order("published_at", { ascending: false });
-      if (data) setArticles(data.map(rowToArticle));
-      setLoading(false);
-    }
     load();
-
-    // Realtime subscription
     const channel = supabase
       .channel("articles-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "articles" },
-        () => {
-          load();
-        }
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "articles" }, () => load())
       .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   const filteredArticles = useMemo(() => {
     let result = articles;
-
     if (search) {
       const q = search.toLowerCase();
-      result = result.filter(
-        (a) =>
-          a.title.toLowerCase().includes(q) ||
-          a.summary.toLowerCase().includes(q) ||
-          a.cves.some((c) => c.toLowerCase().includes(q)) ||
-          a.affectedProducts.some((p) => p.toLowerCase().includes(q)) ||
-          a.threatActors.some((t) => t.toLowerCase().includes(q))
-      );
-    }
-
-    if (threatFilters.length > 0) {
-      result = result.filter((a) => threatFilters.includes(a.threatLevel));
-    }
-    if (categoryFilters.length > 0) {
-      result = result.filter((a) => categoryFilters.includes(a.category));
-    }
-    if (industryFilters.length > 0) {
       result = result.filter((a) =>
-        a.industries.some((i) => industryFilters.includes(i))
+        a.title.toLowerCase().includes(q) || a.summary.toLowerCase().includes(q) ||
+        a.cves.some((c) => c.toLowerCase().includes(q)) ||
+        a.affectedProducts.some((p) => p.toLowerCase().includes(q)) ||
+        a.threatActors.some((t) => t.toLowerCase().includes(q))
       );
     }
-
+    if (threatFilters.length > 0) result = result.filter((a) => threatFilters.includes(a.threatLevel));
+    if (categoryFilters.length > 0) result = result.filter((a) => categoryFilters.includes(a.category));
+    if (industryFilters.length > 0) result = result.filter((a) => a.industries.some((i) => industryFilters.includes(i)));
     return result;
   }, [articles, search, threatFilters, categoryFilters, industryFilters]);
 
-  const activeFilterCount =
-    threatFilters.length + categoryFilters.length + industryFilters.length;
+  const activeFilterCount = threatFilters.length + categoryFilters.length + industryFilters.length;
 
   function toggleFilter<T>(arr: T[], value: T, setter: (v: T[]) => void) {
     setter(arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]);
   }
 
   function clearAllFilters() {
-    setThreatFilters([]);
-    setCategoryFilters([]);
-    setIndustryFilters([]);
-    setSearch("");
+    setThreatFilters([]); setCategoryFilters([]); setIndustryFilters([]); setSearch("");
   }
+
+  // Computed stats
+  const criticalCount = articles.filter((a) => a.threatLevel === "critical").length;
+  const highCount = articles.filter((a) => a.threatLevel === "high").length;
+  const zeroDayCount = articles.filter((a) => a.category === "zero-day" || a.tags.some((t) => t.includes("zero-day"))).length;
+  const allCves = new Set(articles.flatMap((a) => a.cves));
+  const allSources = new Set(articles.map((a) => a.source));
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    articles.forEach((a) => { counts[a.category] = (counts[a.category] || 0) + 1; });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  }, [articles]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Intelligence Dashboard</h1>
           <p className="text-sm text-muted-foreground">
             Real-time threat intelligence feed
+            {lastUpdated && (
+              <span className="ml-2 text-xs">
+                &middot; Updated {lastUpdated.toLocaleTimeString()}
+              </span>
+            )}
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { setRefreshing(true); load(); }}
+            disabled={refreshing}
+            className="gap-1.5 text-xs"
+          >
+            <RefreshCw className={cn("h-3.5 w-3.5", refreshing && "animate-spin")} />
+            Refresh
+          </Button>
           <div className="flex items-center gap-1.5 rounded-full bg-threat-critical/10 px-2.5 py-1 text-xs font-medium text-threat-critical">
             <span className="h-1.5 w-1.5 rounded-full bg-threat-critical animate-threat-pulse" />
             LIVE
@@ -173,8 +169,48 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Stats Row */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 mb-6">
+        <Card className="border-threat-critical/20 bg-threat-critical/5">
+          <CardContent className="p-3 text-center">
+            <div className="text-xl font-mono font-bold text-threat-critical">{criticalCount}</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Critical</div>
+          </CardContent>
+        </Card>
+        <Card className="border-threat-high/20 bg-threat-high/5">
+          <CardContent className="p-3 text-center">
+            <div className="text-xl font-mono font-bold text-threat-high">{highCount}</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">High</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-3 text-center">
+            <div className="text-xl font-mono font-bold text-primary">{zeroDayCount}</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Zero-Days</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-3 text-center">
+            <div className="text-xl font-mono font-bold text-primary">{allCves.size}</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">CVEs</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-3 text-center">
+            <div className="text-xl font-mono font-bold text-foreground">{articles.length}</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Reports</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-3 text-center">
+            <div className="text-xl font-mono font-bold text-foreground">{allSources.size}</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Sources</div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Search + Filter bar */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center mb-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center mb-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -184,103 +220,62 @@ export default function DashboardPage() {
             className="pl-9 bg-card"
           />
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowFilters(!showFilters)}
-          className={cn("gap-1.5", showFilters && "bg-accent")}
-        >
-          <SlidersHorizontal className="h-3.5 w-3.5" />
-          Filters
-          {activeFilterCount > 0 && (
-            <Badge className="ml-1 h-5 w-5 rounded-full p-0 text-[10px] flex items-center justify-center">
-              {activeFilterCount}
-            </Badge>
-          )}
-        </Button>
-        {activeFilterCount > 0 && (
+        <div className="flex items-center gap-2">
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearAllFilters}
-            className="gap-1 text-xs text-muted-foreground"
+            variant="outline" size="sm"
+            onClick={() => setShowFilters(!showFilters)}
+            className={cn("gap-1.5", showFilters && "bg-accent")}
           >
-            <X className="h-3 w-3" />
-            Clear
+            <SlidersHorizontal className="h-3.5 w-3.5" />
+            Filters
+            {activeFilterCount > 0 && (
+              <Badge className="ml-1 h-5 w-5 rounded-full p-0 text-[10px] flex items-center justify-center">
+                {activeFilterCount}
+              </Badge>
+            )}
           </Button>
-        )}
+          {activeFilterCount > 0 && (
+            <Button variant="ghost" size="sm" onClick={clearAllFilters} className="gap-1 text-xs text-muted-foreground">
+              <X className="h-3 w-3" /> Clear
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Filters Panel */}
       {showFilters && (
-        <Card className="mb-6">
+        <Card className="mb-4">
           <CardContent className="p-4 space-y-4">
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                Threat Level
-              </h3>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Threat Level</h3>
               <div className="flex flex-wrap gap-2">
                 {THREAT_LEVELS.map((level) => (
-                  <button
-                    key={level}
-                    onClick={() =>
-                      toggleFilter(threatFilters, level, setThreatFilters)
-                    }
-                    className={cn(
-                      "transition-opacity",
-                      threatFilters.length > 0 &&
-                        !threatFilters.includes(level) &&
-                        "opacity-40"
-                    )}
-                  >
+                  <button key={level} onClick={() => toggleFilter(threatFilters, level, setThreatFilters)}
+                    className={cn("transition-opacity", threatFilters.length > 0 && !threatFilters.includes(level) && "opacity-40")}>
                     <ThreatBadge level={level} />
                   </button>
                 ))}
               </div>
             </div>
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                Category
-              </h3>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Category</h3>
               <div className="flex flex-wrap gap-1.5">
                 {CATEGORIES.map((cat) => (
-                  <Badge
-                    key={cat.value}
-                    variant="outline"
-                    className={cn(
-                      "cursor-pointer text-xs transition-all",
-                      categoryFilters.includes(cat.value)
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "hover:bg-accent"
-                    )}
-                    onClick={() =>
-                      toggleFilter(categoryFilters, cat.value, setCategoryFilters)
-                    }
-                  >
+                  <Badge key={cat.value} variant="outline"
+                    className={cn("cursor-pointer text-xs transition-all", categoryFilters.includes(cat.value) ? "bg-primary text-primary-foreground border-primary" : "hover:bg-accent")}
+                    onClick={() => toggleFilter(categoryFilters, cat.value, setCategoryFilters)}>
                     {cat.label}
                   </Badge>
                 ))}
               </div>
             </div>
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                Industry
-              </h3>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Industry</h3>
               <div className="flex flex-wrap gap-1.5">
                 {INDUSTRIES.map((ind) => (
-                  <Badge
-                    key={ind.value}
-                    variant="outline"
-                    className={cn(
-                      "cursor-pointer text-xs transition-all",
-                      industryFilters.includes(ind.value)
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "hover:bg-accent"
-                    )}
-                    onClick={() =>
-                      toggleFilter(industryFilters, ind.value, setIndustryFilters)
-                    }
-                  >
+                  <Badge key={ind.value} variant="outline"
+                    className={cn("cursor-pointer text-xs transition-all", industryFilters.includes(ind.value) ? "bg-primary text-primary-foreground border-primary" : "hover:bg-accent")}
+                    onClick={() => toggleFilter(industryFilters, ind.value, setIndustryFilters)}>
                     {ind.label}
                   </Badge>
                 ))}
@@ -290,18 +285,18 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+      <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
         {/* Main Feed */}
         <div>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-muted-foreground">
               {loading ? "Loading..." : `${filteredArticles.length} ${filteredArticles.length === 1 ? "result" : "results"}`}
             </h2>
           </div>
           {loading ? (
             <div className="space-y-3">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-40 w-full rounded-lg" />
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="h-32 w-full rounded-lg" />
               ))}
             </div>
           ) : filteredArticles.length === 0 ? (
@@ -309,22 +304,50 @@ export default function DashboardPage() {
               <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                 <Search className="h-8 w-8 text-muted-foreground mb-3" />
                 <h3 className="text-sm font-semibold">No results found</h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Try adjusting your search or filters
-                </p>
+                <p className="text-xs text-muted-foreground mt-1">Try adjusting your search or filters</p>
               </CardContent>
             </Card>
           ) : (
             <div className="space-y-3">
-              {filteredArticles.map((article) => (
-                <ArticleCard key={article.id} article={article} />
-              ))}
+              {/* Feature the first critical article */}
+              {filteredArticles[0] && (
+                <ArticleCard article={filteredArticles[0]} variant="featured" />
+              )}
+              {/* Grid for the rest */}
+              <div className="grid gap-3 sm:grid-cols-2">
+                {filteredArticles.slice(1).map((article) => (
+                  <ArticleCard key={article.id} article={article} />
+                ))}
+              </div>
             </div>
           )}
         </div>
 
         {/* Sidebar */}
-        <aside className="space-y-6">
+        <aside className="space-y-4">
+          {/* Zero-Day Alerts */}
+          {articles.filter((a) => a.category === "zero-day" || a.tags.some((t) => t.includes("zero-day"))).length > 0 && (
+            <Card className="border-threat-critical/30 bg-threat-critical/5">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Bug className="h-4 w-4 text-threat-critical animate-threat-pulse" />
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-threat-critical">
+                    Active Zero-Days
+                  </h3>
+                </div>
+                <div className="space-y-1">
+                  {articles
+                    .filter((a) => a.category === "zero-day" || a.tags.some((t) => t.includes("zero-day")))
+                    .slice(0, 5)
+                    .map((a) => (
+                      <ArticleCard key={a.id} article={a} variant="compact" />
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Critical Alerts */}
           <Card className="border-threat-critical/20">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-3">
@@ -336,53 +359,75 @@ export default function DashboardPage() {
               <div className="space-y-1">
                 {articles
                   .filter((a) => a.threatLevel === "critical")
-                  .slice(0, 4)
-                  .map((article) => (
-                    <ArticleCard
-                      key={article.id}
-                      article={article}
-                      variant="compact"
-                    />
+                  .slice(0, 5)
+                  .map((a) => (
+                    <ArticleCard key={a.id} article={a} variant="compact" />
                   ))}
               </div>
             </CardContent>
           </Card>
 
+          {/* Category Breakdown */}
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-3">
-                <TrendingUp className="h-4 w-4 text-primary" />
+                <BarChart3 className="h-4 w-4 text-primary" />
                 <h3 className="text-xs font-semibold uppercase tracking-wider">
-                  Trending
+                  By Category
                 </h3>
               </div>
-              <div className="space-y-1">
-                {articles.slice(0, 5).map((article) => (
-                  <ArticleCard
-                    key={article.id}
-                    article={article}
-                    variant="compact"
-                  />
+              <div className="space-y-2">
+                {categoryCounts.slice(0, 8).map(([cat, count]) => (
+                  <button
+                    key={cat}
+                    onClick={() => toggleFilter(categoryFilters, cat as Category, setCategoryFilters)}
+                    className="flex items-center justify-between w-full text-xs hover:bg-accent rounded px-2 py-1 transition-colors"
+                  >
+                    <span className="capitalize text-muted-foreground">{cat.replace("-", " ")}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="h-1.5 rounded-full bg-primary/20 w-16">
+                        <div
+                          className="h-1.5 rounded-full bg-primary"
+                          style={{ width: `${Math.min(100, (count / articles.length) * 100)}%` }}
+                        />
+                      </div>
+                      <span className="font-mono font-medium text-foreground w-6 text-right">{count}</span>
+                    </div>
+                  </button>
                 ))}
               </div>
             </CardContent>
           </Card>
 
+          {/* Trending */}
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-3">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <h3 className="text-xs font-semibold uppercase tracking-wider">
-                  Recent Updates
-                </h3>
+                <TrendingUp className="h-4 w-4 text-primary" />
+                <h3 className="text-xs font-semibold uppercase tracking-wider">Trending</h3>
               </div>
-              <div className="space-y-2 text-xs text-muted-foreground">
-                {articles.slice(0, 4).map((a) => (
-                  <div key={a.id} className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
-                    <span className="line-clamp-2">{a.title}</span>
-                  </div>
+              <div className="space-y-1">
+                {articles.slice(0, 6).map((a) => (
+                  <ArticleCard key={a.id} article={a} variant="compact" />
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Sources */}
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Shield className="h-4 w-4 text-muted-foreground" />
+                <h3 className="text-xs font-semibold uppercase tracking-wider">Sources</h3>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {[...allSources].slice(0, 12).map((s) => (
+                  <Badge key={s} variant="secondary" className="text-[10px]">{s}</Badge>
+                ))}
+                {allSources.size > 12 && (
+                  <Badge variant="secondary" className="text-[10px]">+{allSources.size - 12} more</Badge>
+                )}
               </div>
             </CardContent>
           </Card>
