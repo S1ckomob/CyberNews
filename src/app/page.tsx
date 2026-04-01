@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { ArticleCard } from "@/components/article-card";
 import { SubscribeForm } from "@/components/subscribe-form";
 import { ThreatLevelIndicator } from "@/components/threat-level-indicator";
+import { FreshnessBadge } from "@/components/freshness-badge";
 import { SeverityChart } from "@/components/severity-chart";
 import { ActivityFeed } from "@/components/activity-feed";
 import { StatsBar } from "@/components/stats-bar";
@@ -94,6 +95,7 @@ export default async function HomePage() {
               <div className="flex items-center gap-2">
                 <Clock className="h-3.5 w-3.5 text-primary" />
                 <h2 className="text-xs font-bold uppercase tracking-widest">Latest Intelligence</h2>
+              {articles[0] && <FreshnessBadge latestPublishedAt={articles[0].publishedAt} />}
               </div>
               <Link href="/dashboard">
                 <Button variant="ghost" size="sm" className="gap-1 text-xs h-6">

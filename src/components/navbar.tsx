@@ -47,6 +47,7 @@ const moreNav = [
   { name: "Industries", href: "/industry", icon: Building2 },
   { name: "Watchlist", href: "/watchlist", icon: Eye },
   { name: "Saved", href: "/saved", icon: Bookmark },
+  { name: "API Docs", href: "/api-docs", icon: Clock },
   { name: "Help", href: "/help", icon: HelpCircle },
   { name: "About", href: "/about", icon: Sparkles },
 ];
@@ -64,6 +65,7 @@ const allNav = [
   { name: "Industries", href: "/industry", icon: Building2 },
   { name: "Watchlist", href: "/watchlist", icon: Eye },
   { name: "Saved", href: "/saved", icon: Bookmark },
+  { name: "API Docs", href: "/api-docs", icon: Clock },
   { name: "Help", href: "/help", icon: HelpCircle },
   { name: "About", href: "/about", icon: Sparkles },
 ];

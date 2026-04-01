@@ -50,6 +50,11 @@ export const metadata: Metadata = {
     description:
       "The institutional standard for cybersecurity intelligence.",
   },
+  alternates: {
+    types: {
+      "application/rss+xml": "/feed.xml",
+    },
+  },
 };
 
 export default function RootLayout({

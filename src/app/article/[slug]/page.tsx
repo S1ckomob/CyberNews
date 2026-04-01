@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -64,16 +64,25 @@ export async function generateMetadata({
   const { slug } = await params;
   const article = await fetchArticleBySlug(slug);
   if (!article) return { title: "Not Found" };
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.app";
   return {
     title: article.title,
     description: article.summary,
+    alternates: { canonical: `${siteUrl}/article/${slug}` },
     openGraph: {
-      title: article.title,
+      title: `${article.threatLevel.toUpperCase()}: ${article.title}`,
       description: article.summary,
       type: "article",
+      url: `${siteUrl}/article/${slug}`,
+      siteName: "CyberIntel",
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt,
       tags: article.tags,
+    },
+    twitter: {
+      card: "summary",
+      title: `${article.threatLevel.toUpperCase()}: ${article.title}`,
+      description: article.summary,
     },
   };
 }
@@ -124,8 +133,27 @@ export default async function ArticlePage({
     article.patchedAt && { label: "Patch Available", date: article.patchedAt },
   ].filter(Boolean) as { label: string; date: string }[];
 
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.app";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: article.title,
+    description: article.summary,
+    datePublished: article.publishedAt,
+    dateModified: article.updatedAt,
+    author: { "@type": "Organization", name: article.source, url: article.sourceUrl },
+    publisher: { "@type": "Organization", name: "CyberIntel", url: siteUrl },
+    url: `${siteUrl}/article/${article.slug}`,
+    keywords: article.tags.join(", "),
+    articleSection: article.category,
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1 text-xs text-muted-foreground mb-6">
         <Link href="/" className="hover:text-foreground transition-colors">
