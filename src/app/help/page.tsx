@@ -51,12 +51,36 @@ export default function HelpPage() {
         <HelpCircle className="h-6 w-6 text-primary" />
         <h1 className="text-2xl font-bold tracking-tight">Help & Navigation</h1>
       </div>
-      <p className="text-sm text-muted-foreground mb-8">
+      <p className="text-sm text-muted-foreground mb-6">
         Everything you need to know to get the most out of CyberIntel.
       </p>
 
+      {/* Quick Nav */}
+      <Card className="mb-8">
+        <CardContent className="p-4">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Jump to</h2>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: "Shortcuts", href: "#shortcuts" },
+              { label: "Features", href: "#features" },
+              { label: "All Pages", href: "#pages" },
+              { label: "Data Sources", href: "#sources" },
+              { label: "Threat Levels", href: "#threat-levels" },
+            ].map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              >
+                {item.label}
+              </a>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Keyboard Shortcuts */}
-      <section className="mb-8">
+      <section id="shortcuts" className="mb-8 scroll-mt-20">
         <div className="flex items-center gap-2 mb-4">
           <Keyboard className="h-4 w-4 text-primary" />
           <h2 className="text-sm font-semibold uppercase tracking-wider">Keyboard Shortcuts</h2>
@@ -82,7 +106,7 @@ export default function HelpPage() {
       </section>
 
       {/* Features */}
-      <section className="mb-8">
+      <section id="features" className="mb-8 scroll-mt-20">
         <div className="flex items-center gap-2 mb-4">
           <Command className="h-4 w-4 text-primary" />
           <h2 className="text-sm font-semibold uppercase tracking-wider">Features</h2>
@@ -105,7 +129,7 @@ export default function HelpPage() {
       <Separator className="my-8" />
 
       {/* Page Directory */}
-      <section className="mb-8">
+      <section id="pages" className="mb-8 scroll-mt-20">
         <h2 className="text-sm font-semibold uppercase tracking-wider mb-4">All Pages</h2>
         <div className="space-y-2">
           {pages.map((page) => (
@@ -132,7 +156,7 @@ export default function HelpPage() {
       </section>
 
       {/* Data Sources */}
-      <section className="mb-8">
+      <section id="sources" className="mb-8 scroll-mt-20">
         <h2 className="text-sm font-semibold uppercase tracking-wider mb-4">Data Sources</h2>
         <Card>
           <CardContent className="p-4">
@@ -153,7 +177,7 @@ export default function HelpPage() {
       </section>
 
       {/* Threat Levels */}
-      <section>
+      <section id="threat-levels" className="scroll-mt-20">
         <h2 className="text-sm font-semibold uppercase tracking-wider mb-4">Threat Levels</h2>
         <Card>
           <CardContent className="p-4 space-y-3">
