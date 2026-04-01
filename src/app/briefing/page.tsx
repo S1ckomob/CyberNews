@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { PDFExportButton } from "@/components/pdf-export-button";
 import { ThreatBadge } from "@/components/threat-badge";
 import { ArticleCard } from "@/components/article-card";
 import { fetchArticles } from "@/lib/queries";
@@ -73,6 +74,9 @@ export default async function BriefingPage() {
           Daily Threat Briefing
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">{dateStr}</p>
+        <div className="mt-3">
+          <PDFExportButton />
+        </div>
         <div className="mt-2 flex items-center justify-center gap-1 text-xs text-muted-foreground">
           <Clock className="h-3 w-3" />
           Generated from {last24h.length} reports across {topSources.length} sources

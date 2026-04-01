@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { XMLParser } from "fast-xml-parser";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
+import { sendSlackAlert } from "@/lib/slack";
 
 // ---------- Types ----------
 
@@ -390,6 +391,7 @@ export async function POST(request: NextRequest) {
 
   // Insert with deduplication
   let totalInserted = 0;
+  const newlyInserted: IngestArticle[] = [];
   for (const { source, article } of allArticles) {
     const { data: existing } = await getSupabaseAdmin()
       .from("articles")
@@ -409,7 +411,13 @@ export async function POST(request: NextRequest) {
     } else {
       results[source] = (results[source] || 0) + 1;
       totalInserted++;
+      newlyInserted.push(article);
     }
+  }
+
+  // Send Slack alerts for urgent new articles
+  if (newlyInserted.length > 0) {
+    await sendSlackAlert(newlyInserted).catch(() => {});
   }
 
   return NextResponse.json({

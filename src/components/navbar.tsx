@@ -26,6 +26,7 @@ import {
   Users,
   Building2,
   Bookmark,
+  TrendingUp,
 } from "lucide-react";
 
 const primaryNav = [
@@ -36,6 +37,7 @@ const primaryNav = [
 ];
 
 const moreNav = [
+  { name: "Trends", href: "/trends", icon: TrendingUp },
   { name: "Timeline", href: "/timeline", icon: Clock },
   { name: "Ransomware", href: "/ransomware", icon: Lock },
   { name: "Firewalls", href: "/firewalls", icon: Shield },

@@ -127,9 +127,9 @@ export default function CvePage() {
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="h-4 w-4 text-threat-high" />
-                      <span className="font-mono text-base font-bold">
+                      <Link href={`/cve/${entry.cve}`} className="font-mono text-base font-bold hover:text-primary transition-colors">
                         {entry.cve}
-                      </span>
+                      </Link>
                       <ThreatBadge level={entry.highestThreat} size="sm" />
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
