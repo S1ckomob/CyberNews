@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
+import { ThreatTicker } from "@/components/threat-ticker";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
@@ -64,6 +65,7 @@ export default function RootLayout({
         <ThemeProvider>
         <TooltipProvider>
           <Navbar />
+          <ThreatTicker />
           <main className="flex-1">{children}</main>
           <footer className="border-t border-border bg-card/50">
             <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

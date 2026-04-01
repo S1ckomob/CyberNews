@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { NotificationManager } from "@/components/notification-manager";
 import {
   Shield,
   LayoutDashboard,
@@ -15,18 +16,23 @@ import {
   Building2,
   Monitor,
   Bug,
+  Lock,
+  Sparkles,
+  Eye,
   Menu,
   X,
 } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Briefing", href: "/briefing", icon: Sparkles },
   { name: "Zero-Days", href: "/zero-days", icon: Bug },
-  { name: "Windows", href: "/windows", icon: Monitor },
+  { name: "Ransomware", href: "/ransomware", icon: Lock },
   { name: "Firewalls", href: "/firewalls", icon: Shield },
+  { name: "Windows", href: "/windows", icon: Monitor },
   { name: "CVEs", href: "/cve", icon: Search },
-  { name: "Threat Actors", href: "/threat-actors", icon: Users },
-  { name: "Industries", href: "/industry", icon: Building2 },
+  { name: "Actors", href: "/threat-actors", icon: Users },
+  { name: "Watchlist", href: "/watchlist", icon: Eye },
 ];
 
 export function Navbar() {
@@ -69,6 +75,7 @@ export function Navbar() {
             <span className="h-1.5 w-1.5 rounded-full bg-threat-critical animate-threat-pulse" />
             LIVE
           </div>
+          <NotificationManager />
           <ThemeToggle />
           <Link href="/about">
             <Button variant="outline" size="sm" className="text-xs">

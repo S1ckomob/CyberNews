@@ -200,6 +200,20 @@
   animation: threat-pulse 2s ease-in-out infinite;
 }
 
+/* Ticker scroll animation */
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-ticker {
+  animation: ticker-scroll 120s linear infinite;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
