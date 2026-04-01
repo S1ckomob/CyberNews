@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ArticleCard } from "@/components/article-card";
+import { SubscribeForm } from "@/components/subscribe-form";
 import { StatsBar } from "@/components/stats-bar";
 import { fetchArticles } from "@/lib/queries";
 import {
@@ -227,14 +228,7 @@ export default async function HomePage() {
                   Critical threats and verified CVEs delivered daily.
                   Trusted by 15,000+ security professionals.
                 </p>
-                <div className="flex gap-2">
-                  <input
-                    type="email"
-                    placeholder="security@company.com"
-                    className="flex-1 rounded-md border border-border bg-background px-2.5 py-1.5 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  <Button size="sm" className="text-xs">Subscribe</Button>
-                </div>
+                <SubscribeForm />
               </CardContent>
             </Card>
           </aside>
