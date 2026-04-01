@@ -6,6 +6,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   Shield,
   LayoutDashboard,
@@ -63,6 +64,7 @@ export function Navbar() {
             <span className="h-1.5 w-1.5 rounded-full bg-threat-critical animate-threat-pulse" />
             LIVE
           </div>
+          <ThemeToggle />
           <Link href="/about">
             <Button variant="outline" size="sm" className="text-xs">
               About
@@ -108,6 +110,9 @@ export function Navbar() {
               >
                 About
               </Link>
+              <div className="mt-4 px-3">
+                <ThemeToggle />
+              </div>
             </nav>
           </SheetContent>
         </Sheet>
