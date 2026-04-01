@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Bell, BellOff } from "lucide-react";
 
 export function NotificationManager() {
+  const [mounted, setMounted] = useState(false);
   const [enabled, setEnabled] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission>("default");
   const seenIds = useRef(new Set<string>());
 
   useEffect(() => {
-    if (typeof window === "undefined" || !("Notification" in window)) return;
+    setMounted(true);
+    if (!("Notification" in window)) return;
     setPermission(Notification.permission);
     setEnabled(localStorage.getItem("cyberintel-notifications") === "true");
   }, []);
@@ -86,7 +88,7 @@ export function NotificationManager() {
     }
   }
 
-  if (typeof window === "undefined" || !("Notification" in window)) return null;
+  if (!mounted) return null;
 
   return (
     <Button
