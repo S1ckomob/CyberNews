@@ -193,16 +193,13 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
               <span className="flex items-center gap-1.5">
                 <span className="font-mono text-[10px]">{article.source}</span>
                 {article.sourceUrl && (
-                  <a
-                    href={article.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
+                  <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(article.sourceUrl, "_blank", "noopener,noreferrer"); }}
                     className="text-muted-foreground/50 hover:text-primary transition-colors"
                     title="Open original source"
                   >
                     <ExternalLink className="h-3 w-3" />
-                  </a>
+                  </button>
                 )}
               </span>
             </div>
