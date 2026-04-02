@@ -102,18 +102,11 @@ function guessCategory(text: string): string {
   return "vulnerability";
 }
 
-const KNOWN_ACTORS = [
-  "APT29", "APT28", "Lazarus", "LockBit", "Cl0p", "BlackCat", "ALPHV",
-  "Scattered Spider", "Volt Typhoon", "Salt Typhoon", "Sandworm",
-  "Black Basta", "Rhysida", "Medusa", "Play", "RansomHub", "Akira",
-  "NoName057", "KillNet", "Anonymous Sudan", "UNC3886", "Flax Typhoon",
-  "Turla", "Kimsuky", "Charming Kitten", "MuddyWater",
-];
+import { ALL_THREAT_ACTORS } from "@/lib/threat-actors-list";
 
 function extractActors(text: string): string[] {
-  return KNOWN_ACTORS.filter((actor) =>
-    text.toLowerCase().includes(actor.toLowerCase())
-  );
+  const lower = text.toLowerCase();
+  return ALL_THREAT_ACTORS.filter((actor) => lower.includes(actor.toLowerCase()));
 }
 
 // ---------- RSS Feed Fetcher ----------

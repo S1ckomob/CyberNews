@@ -51,11 +51,7 @@ const SUGGESTED_PRODUCTS = [
   "Active Directory", "Microsoft 365", "Juniper Junos",
 ];
 
-const SUGGESTED_ACTORS = [
-  "APT29", "APT28", "LockBit", "Cl0p", "Scattered Spider",
-  "Salt Typhoon", "Volt Typhoon", "Sandworm", "Lazarus Group",
-  "Black Basta", "Rhysida", "Medusa", "UNC3886",
-];
+import { SUGGESTED_ACTORS } from "@/lib/threat-actors-list";
 
 export default function WatchlistPage() {
   const [watchlist, setWatchlist] = useState<Watchlist>({ products: [], actors: [], cves: [] });

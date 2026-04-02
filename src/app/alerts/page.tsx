@@ -39,11 +39,7 @@ const SUGGESTED_PRODUCTS = [
   "Google Chrome", "Jenkins", "WordPress", "Apache",
 ];
 
-const SUGGESTED_ACTORS = [
-  "APT29", "APT28", "LockBit", "Cl0p", "Scattered Spider",
-  "Salt Typhoon", "Volt Typhoon", "Sandworm", "Lazarus Group",
-  "Black Basta", "Rhysida", "UNC3886", "Medusa",
-];
+import { SUGGESTED_ACTORS } from "@/lib/threat-actors-list";
 
 export default function AlertsPage() {
   const [email, setEmail] = useState("");
