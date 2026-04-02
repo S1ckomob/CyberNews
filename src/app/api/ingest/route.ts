@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { XMLParser } from "fast-xml-parser";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
 import { sendSlackAlert } from "@/lib/slack";
+import { sendPersonalizedAlerts } from "@/lib/alert-matcher";
 
 // ---------- Types ----------
 
@@ -470,9 +471,12 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Send Slack alerts for urgent new articles
+  // Send alerts for new articles
   if (newlyInserted.length > 0) {
-    await sendSlackAlert(newlyInserted).catch(() => {});
+    await Promise.all([
+      sendSlackAlert(newlyInserted).catch(() => {}),
+      sendPersonalizedAlerts(newlyInserted).catch(() => {}),
+    ]);
   }
 
   return NextResponse.json({

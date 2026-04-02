@@ -32,6 +32,7 @@ import {
   Calendar,
   Target,
   BarChart3,
+  Bell,
 } from "lucide-react";
 
 const primaryNav = [
@@ -39,6 +40,7 @@ const primaryNav = [
   { name: "Briefing", href: "/briefing" },
   { name: "Zero-Days", href: "/zero-days" },
   { name: "CVEs", href: "/cve" },
+  { name: "Alerts", href: "/alerts" },
 ];
 
 const moreNav = [
@@ -62,6 +64,7 @@ const moreNav = [
 
 const allNav = [
   { name: "Intelligence", href: "/intelligence", icon: LayoutDashboard },
+  { name: "Alerts", href: "/alerts", icon: Bell },
   { name: "Briefing", href: "/briefing", icon: Sparkles },
   { name: "Timeline", href: "/timeline", icon: Clock },
   { name: "Zero-Days", href: "/zero-days", icon: Bug },
