@@ -53,6 +53,27 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: "phishing", label: "Phishing" },
   { value: "ddos", label: "DDoS" },
 ];
+type AppType = typeof APP_TYPES[number]["value"];
+const APP_TYPES = [
+  { value: "firewall", label: "Firewall / Network Edge", keywords: ["fortinet","fortigate","fortios","fortimanager","palo alto","pan-os","globalprotect","cisco asa","cisco firepower","sonicwall","ivanti","pulse secure","juniper","check point","f5 big-ip","vpn","firewall"] },
+  { value: "cloud", label: "Cloud / SaaS", keywords: ["aws","azure","gcp","cloud","kubernetes","docker","container","saas","serverless","lambda","s3","ec2"] },
+  { value: "endpoint", label: "Endpoint / OS", keywords: ["windows","linux","macos","kernel","active directory","hyper-v","ntlm","vmware esxi","vcenter","endpoint"] },
+  { value: "web", label: "Web Application", keywords: ["wordpress","apache","nginx","iis","web application","sql injection","xss","cms","php","drupal"] },
+  { value: "email", label: "Email / Collaboration", keywords: ["exchange","outlook","microsoft 365","teams","gmail","email","o365","sharepoint","slack"] },
+  { value: "browser", label: "Browser", keywords: ["chrome","firefox","edge","safari","webkit","chromium","browser","v8"] },
+  { value: "devops", label: "DevOps / CI-CD", keywords: ["jenkins","github","gitlab","cicd","ci/cd","npm","pypi","docker","terraform","ansible","supply chain","pipeline"] },
+  { value: "mobile", label: "Mobile", keywords: ["ios","android","mobile","iphone","ipad","samsung","pixel"] },
+  { value: "ics", label: "ICS / OT / SCADA", keywords: ["scada","ics","plc","ot network","industrial","siemens","schneider","hmi","dcs","rtu"] },
+  { value: "database", label: "Database", keywords: ["sql","mysql","postgres","oracle","mongodb","redis","database","elasticsearch"] },
+] as const;
+
+function getAppTypes(article: Article): string[] {
+  const text = `${article.title} ${article.affectedProducts.join(" ")} ${article.summary} ${article.tags.join(" ")}`.toLowerCase();
+  return APP_TYPES
+    .filter((t) => t.keywords.some((kw) => text.includes(kw)))
+    .map((t) => t.value);
+}
+
 const INDUSTRIES: { value: Industry; label: string }[] = [
   { value: "healthcare", label: "Healthcare" },
   { value: "finance", label: "Finance" },
@@ -74,6 +95,7 @@ export default function DashboardPage() {
   const [threatFilters, setThreatFilters] = useState<ThreatLevel[]>([]);
   const [categoryFilters, setCategoryFilters] = useState<Category[]>([]);
   const [industryFilters, setIndustryFilters] = useState<Industry[]>([]);
+  const [appTypeFilters, setAppTypeFilters] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
@@ -111,17 +133,21 @@ export default function DashboardPage() {
     if (threatFilters.length > 0) result = result.filter((a) => threatFilters.includes(a.threatLevel));
     if (categoryFilters.length > 0) result = result.filter((a) => categoryFilters.includes(a.category));
     if (industryFilters.length > 0) result = result.filter((a) => a.industries.some((i) => industryFilters.includes(i)));
+    if (appTypeFilters.length > 0) result = result.filter((a) => {
+      const types = getAppTypes(a);
+      return appTypeFilters.some((f) => types.includes(f));
+    });
     return result;
-  }, [articles, search, threatFilters, categoryFilters, industryFilters]);
+  }, [articles, search, threatFilters, categoryFilters, industryFilters, appTypeFilters]);
 
-  const activeFilterCount = threatFilters.length + categoryFilters.length + industryFilters.length;
+  const activeFilterCount = threatFilters.length + categoryFilters.length + industryFilters.length + appTypeFilters.length;
 
   function toggleFilter<T>(arr: T[], value: T, setter: (v: T[]) => void) {
     setter(arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]);
   }
 
   function clearAllFilters() {
-    setThreatFilters([]); setCategoryFilters([]); setIndustryFilters([]); setSearch("");
+    setThreatFilters([]); setCategoryFilters([]); setIndustryFilters([]); setAppTypeFilters([]); setSearch("");
   }
 
   // Computed stats
@@ -277,6 +303,18 @@ export default function DashboardPage() {
                     className={cn("cursor-pointer text-xs transition-all", industryFilters.includes(ind.value) ? "bg-primary text-primary-foreground border-primary" : "hover:bg-accent")}
                     onClick={() => toggleFilter(industryFilters, ind.value, setIndustryFilters)}>
                     {ind.label}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Application Type</h3>
+              <div className="flex flex-wrap gap-1.5">
+                {APP_TYPES.map((appType) => (
+                  <Badge key={appType.value} variant="outline"
+                    className={cn("cursor-pointer text-xs transition-all", appTypeFilters.includes(appType.value) ? "bg-primary text-primary-foreground border-primary" : "hover:bg-accent")}
+                    onClick={() => toggleFilter(appTypeFilters, appType.value, setAppTypeFilters)}>
+                    {appType.label}
                   </Badge>
                 ))}
               </div>
