@@ -88,7 +88,7 @@ export default async function HomePage() {
 
       {/* Command Center Layout */}
       <section className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-        <div className="grid gap-4 lg:grid-cols-[220px_1fr_280px]">
+        <div className="grid gap-5 lg:grid-cols-[240px_1fr_300px]">
           {/* Left Column — Severity + Critical Alerts */}
           <div className="space-y-4 hidden lg:block">
             <Card>

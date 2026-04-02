@@ -60,8 +60,9 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
   if (variant === "featured") {
     return (
       <Link href={`/article/${article.slug}`}>
-        <Card className="group relative overflow-hidden border-threat-critical/20 bg-gradient-to-br from-card to-threat-critical/5 transition-all hover:border-threat-critical/40 hover:shadow-lg hover:shadow-threat-critical/5">
-          <CardContent className="p-6">
+        <Card className="group relative overflow-hidden border-threat-critical/25 bg-gradient-to-br from-card via-card to-threat-critical/8 transition-all hover:border-threat-critical/50 hover:shadow-xl hover:shadow-threat-critical/10">
+          <div className="absolute top-0 left-0 w-1 h-full bg-threat-critical rounded-l" />
+          <CardContent className="p-6 pl-5">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 space-y-3">
                 <div className="flex items-center gap-2">
@@ -144,8 +145,8 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
             "border-threat-high/10 hover:border-threat-high/30"
         )}
       >
-        <CardContent className="p-4">
-          <div className="space-y-2.5">
+        <CardContent className="p-4 sm:p-5">
+          <div className="space-y-3">
             <div className="flex items-center gap-2">
               <ThreatBadge level={article.threatLevel} />
               <Badge variant="outline" className="text-[10px] font-mono">
