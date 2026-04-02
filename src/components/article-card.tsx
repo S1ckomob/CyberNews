@@ -166,7 +166,7 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
                 </div>
               )}
             </div>
-            <h3 className="text-sm font-semibold leading-tight group-hover:text-primary transition-colors line-clamp-2">
+            <h3 className="text-base font-semibold leading-tight group-hover:text-primary transition-colors line-clamp-2">
               {article.title}
             </h3>
             <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">

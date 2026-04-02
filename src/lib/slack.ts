@@ -36,7 +36,7 @@ export async function sendSlackAlert(articles: SlackArticle[]) {
       type: "header",
       text: {
         type: "plain_text",
-        text: `🛡 Security Standard Alert — ${urgent.length} New Threat${urgent.length > 1 ? "s" : ""}`,
+        text: `🛡 Security Intel Hub Alert — ${urgent.length} New Threat${urgent.length > 1 ? "s" : ""}`,
       },
     },
   ];

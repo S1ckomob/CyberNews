@@ -92,7 +92,7 @@ function buildEmailHtml(articles: DigestArticle[], date: string) {
 <!-- Header -->
 <tr><td style="padding:24px 24px 16px">
   <table width="100%"><tr>
-    <td><span style="font-size:16px;font-weight:700;color:#e2e8f0">🛡 Security Standard Daily Briefing</span></td>
+    <td><span style="font-size:16px;font-weight:700;color:#e2e8f0">🛡 Security Intel Hub Daily Briefing</span></td>
     <td align="right"><span style="font-size:12px;color:#64748b">${date}</span></td>
   </tr></table>
   <p style="margin:8px 0 0;font-size:13px;color:#94a3b8">Top threats from the last 24 hours. ${articles.length} reports from verified sources.</p>
@@ -131,7 +131,7 @@ function buildEmailHtml(articles: DigestArticle[], date: string) {
 <tr><td style="padding:16px 24px;border-top:1px solid #1e293b;text-align:center">
   <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app"}/intelligence" style="color:#3b82f6;text-decoration:none;font-size:13px;font-weight:600">Open Full Dashboard →</a>
   <br/>
-  <span style="font-size:11px;color:#475569;line-height:2">Security Standard — Institutional Cybersecurity Intelligence</span>
+  <span style="font-size:11px;color:#475569;line-height:2">Security Intel Hub — Institutional Cybersecurity Intelligence</span>
 </td></tr>
 
 </table>
@@ -229,9 +229,9 @@ export async function POST(request: NextRequest) {
 
       try {
         await getResend().emails.send({
-          from: process.env.RESEND_FROM_EMAIL || "Security Standard <digest@securitystandard.dev>",
+          from: process.env.RESEND_FROM_EMAIL || "Security Intel Hub <digest@securityintelhub.dev>",
           to: email,
-          subject: `Security Standard Daily Briefing — ${personalizedArticles.length} threats | ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
+          subject: `Security Intel Hub Daily Briefing — ${personalizedArticles.length} threats | ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
           html,
         });
         results.sent++;

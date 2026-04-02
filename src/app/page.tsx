@@ -38,7 +38,7 @@ export default async function HomePage() {
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Security Standard",
+    name: "Security Intel Hub",
     url: siteUrl,
     description: "The institutional standard for cybersecurity intelligence.",
     potentialAction: {
@@ -50,7 +50,7 @@ export default async function HomePage() {
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Security Standard",
+    name: "Security Intel Hub",
     url: siteUrl,
     description: "Institutional cybersecurity threat intelligence platform.",
     sameAs: [],

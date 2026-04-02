@@ -12,6 +12,7 @@ import { NotificationManager } from "@/components/notification-manager";
 import { useCommandPalette } from "@/lib/command-palette-context";
 import {
   Shield,
+  Radar,
   Search,
   ChevronDown,
   Menu,
@@ -36,10 +37,10 @@ import {
 } from "lucide-react";
 
 const primaryNav = [
+  { name: "Dashboard", href: "/" },
   { name: "Intelligence", href: "/intelligence" },
-  { name: "Briefing", href: "/briefing" },
-  { name: "Zero-Days", href: "/zero-days" },
   { name: "CVEs", href: "/cve" },
+  { name: "Threat Actors", href: "/threat-actors" },
   { name: "Alerts", href: "/alerts" },
 ];
 
@@ -47,13 +48,8 @@ const moreNav = [
   { name: "Threat Map", href: "/map", icon: Globe },
   { name: "Attack Surface", href: "/attack-surface", icon: Target },
   { name: "Executive", href: "/executive", icon: BarChart3 },
-  { name: "Events", href: "/events", icon: Calendar },
   { name: "Trends", href: "/trends", icon: TrendingUp },
-  { name: "Timeline", href: "/timeline", icon: Clock },
-  { name: "Ransomware", href: "/ransomware", icon: Lock },
-  { name: "Firewalls", href: "/firewalls", icon: Shield },
-  { name: "Microsoft", href: "/windows", icon: Monitor },
-  { name: "Threat Actors", href: "/threat-actors", icon: Users },
+  { name: "Events", href: "/events", icon: Calendar },
   { name: "Industries", href: "/industry", icon: Building2 },
   { name: "Watchlist", href: "/watchlist", icon: Eye },
   { name: "Saved", href: "/saved", icon: Bookmark },
@@ -63,23 +59,19 @@ const moreNav = [
 ];
 
 const allNav = [
-  { name: "Intelligence", href: "/intelligence", icon: LayoutDashboard },
-  { name: "Alerts", href: "/alerts", icon: Bell },
-  { name: "Briefing", href: "/briefing", icon: Sparkles },
-  { name: "Timeline", href: "/timeline", icon: Clock },
-  { name: "Zero-Days", href: "/zero-days", icon: Bug },
-  { name: "Ransomware", href: "/ransomware", icon: Lock },
-  { name: "Firewalls", href: "/firewalls", icon: Shield },
-  { name: "Microsoft", href: "/windows", icon: Monitor },
+  { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Intelligence", href: "/intelligence", icon: BarChart3 },
   { name: "CVEs", href: "/cve", icon: Search },
   { name: "Threat Actors", href: "/threat-actors", icon: Users },
+  { name: "Alerts", href: "/alerts", icon: Bell },
+  { name: "Threat Map", href: "/map", icon: Globe },
+  { name: "Attack Surface", href: "/attack-surface", icon: Target },
+  { name: "Executive", href: "/executive", icon: BarChart3 },
+  { name: "Trends", href: "/trends", icon: TrendingUp },
+  { name: "Events", href: "/events", icon: Calendar },
   { name: "Industries", href: "/industry", icon: Building2 },
   { name: "Watchlist", href: "/watchlist", icon: Eye },
   { name: "Saved", href: "/saved", icon: Bookmark },
-  { name: "Attack Surface", href: "/attack-surface", icon: Target },
-  { name: "Executive", href: "/executive", icon: BarChart3 },
-  { name: "Threat Map", href: "/map", icon: Globe },
-  { name: "Events", href: "/events", icon: Calendar },
   { name: "API Docs", href: "/api-docs", icon: Clock },
   { name: "Help", href: "/help", icon: HelpCircle },
   { name: "About", href: "/about", icon: Sparkles },
@@ -99,16 +91,17 @@ export function Navbar() {
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl" role="banner">
       <div className="mx-auto flex h-12 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <Shield className="h-4 w-4 text-primary" />
-          <span className="text-sm font-bold tracking-tight">Security Standard</span>
-        </Link>
+        <div className="flex items-center gap-2 shrink-0">
+          <Radar className="h-5 w-5 text-primary" />
+          <span className="text-base font-bold tracking-tight">Security Intel Hub</span>
+        </div>
 
         {/* Desktop nav — clean text links */}
         <nav aria-label="Primary navigation" className="hidden items-center gap-0.5 lg:flex">
           {primaryNav.map((item) => {
-            const isActive =
-              pathname === item.href || pathname.startsWith(item.href + "/");
+            const isActive = item.href === "/"
+              ? pathname === "/"
+              : pathname === item.href || pathname.startsWith(item.href + "/");
             return (
               <Link
                 key={item.name}

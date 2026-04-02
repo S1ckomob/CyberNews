@@ -42,6 +42,16 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      { source: "/zero-days", destination: "/intelligence?view=zero-day", permanent: true },
+      { source: "/ransomware", destination: "/intelligence?view=ransomware", permanent: true },
+      { source: "/firewalls", destination: "/intelligence?view=firewall", permanent: true },
+      { source: "/windows", destination: "/intelligence?view=microsoft", permanent: true },
+      { source: "/timeline", destination: "/intelligence", permanent: true },
+      { source: "/briefing", destination: "/intelligence", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

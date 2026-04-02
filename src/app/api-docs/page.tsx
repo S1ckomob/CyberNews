@@ -5,7 +5,7 @@ import { Code, Globe, Key, Zap, FileText, Search, Users, Lock } from "lucide-rea
 
 export const metadata = {
   title: "API Documentation",
-  description: "Security Standard REST API for programmatic access to threat intelligence data.",
+  description: "Security Intel Hub REST API for programmatic access to threat intelligence data.",
 };
 
 const endpoints = [
@@ -106,7 +106,7 @@ export default function APIDocsPage() {
         <h1 className="text-2xl font-bold tracking-tight">API Documentation</h1>
       </div>
       <p className="text-sm text-muted-foreground mb-6">
-        Programmatic access to Security Standard threat intelligence. Integrate with your SIEM, SOAR, Slack, or custom tools.
+        Programmatic access to Security Intel Hub threat intelligence. Integrate with your SIEM, SOAR, Slack, or custom tools.
       </p>
 
       {/* Quick Start */}

@@ -12,9 +12,9 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title: "About Security Standard",
+  title: "About Security Intel Hub",
   description:
-    "Security Standard is the institutional standard for cybersecurity intelligence. Learn about our mission, methodology, and commitment to accuracy.",
+    "Security Intel Hub is the institutional standard for cybersecurity intelligence. Learn about our mission, methodology, and commitment to accuracy.",
 };
 
 export default function AboutPage() {
@@ -25,7 +25,7 @@ export default function AboutPage() {
           <Shield className="h-8 w-8 text-primary" />
         </div>
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          About Security Standard
+          About Security Intel Hub
         </h1>
         <p className="mt-3 text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
           The institutional standard for cybersecurity intelligence. Built for
@@ -39,7 +39,7 @@ export default function AboutPage() {
           Our Mission
         </h2>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          Security Standard exists to provide security professionals with the most
+          Security Intel Hub exists to provide security professionals with the most
           accurate, timely, and actionable threat intelligence available. We
           aggregate data from verified sources, enrich it with our analysis,
           and deliver it in a format optimized for security decision-making.
@@ -112,7 +112,7 @@ export default function AboutPage() {
           Our Sources
         </h2>
         <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-          Security Standard aggregates intelligence from the most trusted sources in
+          Security Intel Hub aggregates intelligence from the most trusted sources in
           cybersecurity:
         </p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

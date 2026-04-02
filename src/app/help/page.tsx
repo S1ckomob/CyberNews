@@ -60,7 +60,7 @@ const helpItems: HelpItem[] = [
   { category: "shortcut", title: "Escape", description: "Close the search dialog.", keys: ["Esc"], keywords: "close dismiss" },
 
   // Sources
-  { category: "source", title: "Data Sources", description: "Security Standard ingests from: CISA KEV, NIST NVD, BleepingComputer, The Hacker News, Krebs on Security, Dark Reading, SecurityWeek, CyberScoop, The Record, Threatpost. Updated every 5 minutes.", keywords: "rss feed source cisa nvd bleeping hacker news krebs dark reading securityweek cyberscoop record threatpost" },
+  { category: "source", title: "Data Sources", description: "Security Intel Hub ingests from: CISA KEV, NIST NVD, BleepingComputer, The Hacker News, Krebs on Security, Dark Reading, SecurityWeek, CyberScoop, The Record, Threatpost. Updated every 5 minutes.", keywords: "rss feed source cisa nvd bleeping hacker news krebs dark reading securityweek cyberscoop record threatpost" },
 
   // Threat levels
   { category: "level", title: "CRITICAL", description: "Active exploitation of critical infrastructure, CVSS 9.0+, mass exploitation, emergency directive issued.", keywords: "critical red severity highest" },

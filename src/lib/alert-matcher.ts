@@ -86,7 +86,7 @@ function buildAlertEmail(articles: AlertArticle[], rule: AlertRule): string {
 <tr><td align="center" style="padding:20px">
 <table width="560" cellpadding="0" cellspacing="0" style="background:#0f172a;border-radius:8px;border:1px solid #1e293b">
 <tr><td style="padding:20px 24px 12px">
-  <span style="font-size:14px;font-weight:700;color:#e2e8f0">🚨 Security Standard Alert</span>
+  <span style="font-size:14px;font-weight:700;color:#e2e8f0">🚨 Security Intel Hub Alert</span>
   <br/>
   <span style="font-size:12px;color:#94a3b8">${articles.length} new threat${articles.length !== 1 ? "s" : ""} matching: ${matchDesc}</span>
 </td></tr>
@@ -123,7 +123,7 @@ export async function sendPersonalizedAlerts(newArticles: AlertArticle[]) {
 
     try {
       await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || "Security Standard <alerts@securitystandard.dev>",
+        from: process.env.RESEND_FROM_EMAIL || "Security Intel Hub <alerts@securityintelhub.dev>",
         to: rule.email,
         subject: `🚨 ${matches.length} new threat${matches.length !== 1 ? "s" : ""} matching your alerts — ${matches[0].title.slice(0, 60)}`,
         html: buildAlertEmail(matches, rule),

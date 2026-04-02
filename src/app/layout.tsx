@@ -23,8 +23,8 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.verc
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Security Standard | Institutional Cybersecurity Intelligence",
-    template: "%s | Security Standard",
+    default: "Security Intel Hub | Institutional Cybersecurity Intelligence",
+    template: "%s | Security Intel Hub",
   },
   description:
     "The institutional standard for cybersecurity intelligence. Real-time threat data, verified sources, and actionable intelligence for security teams.",
@@ -34,21 +34,21 @@ export const metadata: Metadata = {
     "incident response", "MITRE ATT&CK", "CVSS", "NVD", "CISA",
     "SOC", "security operations", "cyber threat", "exploit",
   ],
-  authors: [{ name: "Security Standard", url: siteUrl }],
-  creator: "Security Standard",
-  publisher: "Security Standard",
+  authors: [{ name: "Security Intel Hub", url: siteUrl }],
+  creator: "Security Intel Hub",
+  publisher: "Security Intel Hub",
   formatDetection: { telephone: false, email: false },
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "Security Standard",
-    title: "Security Standard | Institutional Cybersecurity Intelligence",
+    siteName: "Security Intel Hub",
+    title: "Security Intel Hub | Institutional Cybersecurity Intelligence",
     description: "Real-time threat data. Verified sources. Actionable intelligence.",
     url: siteUrl,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Security Standard",
+    title: "Security Intel Hub",
     description: "The institutional standard for cybersecurity intelligence.",
   },
   alternates: {
@@ -94,10 +94,17 @@ export default function RootLayout({
               <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
                 <div>
                   <div className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-                    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-primary" stroke="currentColor" strokeWidth="2">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-primary" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M19.07 4.93A10 10 0 0 0 6.99 3.34" />
+                      <path d="M4 6h.01" />
+                      <path d="M2.29 9.62A10 10 0 1 0 21.31 8.35" />
+                      <path d="M16.24 7.76A6 6 0 1 0 8.23 16.67" />
+                      <path d="M12 18h.01" />
+                      <path d="M17.99 11.66A6 6 0 0 1 15.77 16.67" />
+                      <circle cx="12" cy="12" r="2" />
+                      <path d="m13.41 10.59 5.66-5.66" />
                     </svg>
-                    Security Standard
+                    Security Intel Hub
                   </div>
                   <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
                     The institutional standard for cybersecurity
@@ -137,7 +144,7 @@ export default function RootLayout({
                 </div>
               </div>
               <div className="mt-8 border-t border-border pt-6 text-center text-xs text-muted-foreground">
-                &copy; {new Date().getFullYear()} Security Standard. All rights reserved. Intelligence data sourced from verified public sources.
+                &copy; {new Date().getFullYear()} Security Intel Hub. All rights reserved. Intelligence data sourced from verified public sources.
               </div>
             </div>
           </footer>

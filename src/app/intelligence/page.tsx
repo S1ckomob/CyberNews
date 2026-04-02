@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +26,9 @@ import {
   BarChart3,
   RefreshCw,
   PanelRight,
+  Lock,
+  Monitor,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -89,7 +93,27 @@ const INDUSTRIES: { value: Industry; label: string }[] = [
   { value: "manufacturing", label: "Manufacturing" },
 ];
 
+const PRESETS = [
+  { id: "all", label: "All Intel", icon: BarChart3, category: undefined as Category | undefined, appType: undefined as string | undefined },
+  { id: "zero-day", label: "Zero-Days", icon: Bug, category: "zero-day" as Category, appType: undefined as string | undefined },
+  { id: "ransomware", label: "Ransomware", icon: Lock, category: "ransomware" as Category, appType: undefined as string | undefined },
+  { id: "firewall", label: "Firewalls", icon: Shield, category: undefined as Category | undefined, appType: "firewall" },
+  { id: "microsoft", label: "Microsoft", icon: Monitor, category: undefined as Category | undefined, appType: "endpoint" },
+  { id: "supply-chain", label: "Supply Chain", icon: Zap, category: "supply-chain" as Category, appType: undefined as string | undefined },
+] as const;
+
 export default function DashboardPage() {
+  return (
+    <Suspense>
+      <IntelligenceFeed />
+    </Suspense>
+  );
+}
+
+function IntelligenceFeed() {
+  const searchParams = useSearchParams();
+  const presetParam = searchParams.get("view");
+
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -98,8 +122,32 @@ export default function DashboardPage() {
   const [categoryFilters, setCategoryFilters] = useState<Category[]>([]);
   const [industryFilters, setIndustryFilters] = useState<Industry[]>([]);
   const [appTypeFilters, setAppTypeFilters] = useState<string[]>([]);
+  const [activePreset, setActivePreset] = useState<string>(presetParam || "all");
   const [showFilters, setShowFilters] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  // Apply preset from URL on mount
+  useEffect(() => {
+    if (presetParam) {
+      applyPreset(presetParam);
+    }
+  }, [presetParam]);
+
+  function applyPreset(presetId: string) {
+    const preset = PRESETS.find((p) => p.id === presetId);
+    if (!preset) return;
+
+    setActivePreset(presetId);
+    setCategoryFilters(preset.category ? [preset.category] : []);
+    setAppTypeFilters(preset.appType ? [preset.appType] : []);
+    setThreatFilters([]);
+    setIndustryFilters([]);
+    setSearch("");
+
+    // Update URL without reload
+    const url = presetId === "all" ? "/intelligence" : `/intelligence?view=${presetId}`;
+    window.history.replaceState({}, "", url);
+  }
 
   async function load() {
     const { data } = await supabase
@@ -157,14 +205,22 @@ export default function DashboardPage() {
 
   function clearAllFilters() {
     setThreatFilters([]); setCategoryFilters([]); setIndustryFilters([]); setAppTypeFilters([]); setSearch("");
+    setActivePreset("all");
+    window.history.replaceState({}, "", "/intelligence");
   }
 
   // Computed stats
+  const now = new Date();
+  const last24h = articles.filter((a) => now.getTime() - new Date(a.publishedAt).getTime() < 24 * 60 * 60 * 1000);
+  const last3d = articles.filter((a) => now.getTime() - new Date(a.publishedAt).getTime() < 3 * 24 * 60 * 60 * 1000);
   const criticalCount = articles.filter((a) => a.threatLevel === "critical").length;
   const highCount = articles.filter((a) => a.threatLevel === "high").length;
   const zeroDayCount = articles.filter((a) => a.category === "zero-day" || a.tags.some((t) => t.includes("zero-day"))).length;
   const allCves = new Set(articles.flatMap((a) => a.cves));
+  const newCves24h = [...new Set(last24h.flatMap((a) => a.cves))];
   const allSources = new Set(articles.map((a) => a.source));
+  const activeActors = [...new Set(last3d.flatMap((a) => a.threatActors).filter(Boolean))];
+  const ransomwareCount = last3d.filter((a) => a.category === "ransomware" || a.tags.some((t) => t.includes("ransomware"))).length;
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     articles.forEach((a) => { counts[a.category] = (counts[a.category] || 0) + 1; });
@@ -259,6 +315,52 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
+      {/* Active Threat Actors */}
+      {activeActors.length > 0 && (
+        <Card className="border-threat-high/20">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Shield className="h-4 w-4 text-threat-high" />
+              <h3 className="text-xs font-semibold uppercase tracking-wider">
+                Active Actors (3d)
+              </h3>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {activeActors.slice(0, 15).map((actor) => (
+                <Badge key={actor} variant="outline" className="text-xs font-semibold">{actor}</Badge>
+              ))}
+              {activeActors.length > 15 && (
+                <Badge variant="secondary" className="text-[10px]">+{activeActors.length - 15} more</Badge>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* New CVEs (24h) */}
+      {newCves24h.length > 0 && (
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Bug className="h-4 w-4 text-primary" />
+              <h3 className="text-xs font-semibold uppercase tracking-wider">
+                New CVEs (24h) — {newCves24h.length}
+              </h3>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {newCves24h.slice(0, 10).map((cve) => (
+                <a key={cve} href={`https://nvd.nist.gov/vuln/detail/${cve}`} target="_blank" rel="noopener noreferrer">
+                  <Badge variant="secondary" className="font-mono text-[10px] hover:bg-accent cursor-pointer">{cve}</Badge>
+                </a>
+              ))}
+              {newCves24h.length > 10 && (
+                <Badge variant="secondary" className="text-[10px]">+{newCves24h.length - 10} more</Badge>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Sources */}
       <Card>
         <CardContent className="p-4">
@@ -312,6 +414,29 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Quick Presets */}
+      <div className="flex flex-wrap gap-1.5 mb-4">
+        {PRESETS.map((preset) => {
+          const Icon = preset.icon;
+          const isActive = activePreset === preset.id;
+          return (
+            <button
+              key={preset.id}
+              onClick={() => applyPreset(preset.id)}
+              className={cn(
+                "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all",
+                isActive
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-primary/30"
+              )}
+            >
+              <Icon className="h-3 w-3" />
+              {preset.label}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Stats Row */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:grid-cols-6 mb-6">
         <Card className="border-threat-critical/20 bg-threat-critical/5">
@@ -351,6 +476,29 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Situation Overview */}
+      {!loading && last24h.length > 0 && (
+        <Card className="mb-6 border-primary/20 bg-gradient-to-br from-card to-primary/5">
+          <CardContent className="p-4">
+            <h2 className="text-xs font-semibold uppercase tracking-wider mb-2">Situation Overview</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {last24h.filter((a) => a.threatLevel === "critical").length > 0
+                ? `${last24h.filter((a) => a.threatLevel === "critical").length} critical threat${last24h.filter((a) => a.threatLevel === "critical").length > 1 ? "s" : ""} detected in the last 24 hours. `
+                : "No critical threats in the last 24 hours. "}
+              {zeroDayCount > 0
+                ? `${zeroDayCount} actively exploited zero-day${zeroDayCount > 1 ? "s" : ""} tracked. `
+                : ""}
+              {ransomwareCount > 0
+                ? `${ransomwareCount} ransomware report${ransomwareCount > 1 ? "s" : ""} in the last 72 hours. `
+                : ""}
+              {activeActors.length > 0
+                ? `${activeActors.length} named threat actor${activeActors.length > 1 ? "s" : ""} active: ${activeActors.slice(0, 4).join(", ")}${activeActors.length > 4 ? ` +${activeActors.length - 4} more` : ""}.`
+                : ""}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Search + Filter bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center mb-4">
