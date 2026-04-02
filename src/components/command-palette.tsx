@@ -50,7 +50,6 @@ const PAGES = [
   { name: "Trends & Analytics", href: "/trends", icon: Eye },
   { name: "My Watchlist", href: "/watchlist", icon: Eye },
   { name: "Saved Articles", href: "/saved", icon: FileText },
-  { name: "API Documentation", href: "/api-docs", icon: FileText },
   { name: "Help & Navigation", href: "/help", icon: AlertTriangle },
   { name: "About", href: "/about", icon: Globe },
   { name: "Admin Panel", href: "/admin", icon: Lock },

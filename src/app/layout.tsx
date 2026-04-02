@@ -138,7 +138,6 @@ export default function RootLayout({
                   </h4>
                   <ul className="mt-3 space-y-2 text-sm">
                     <li><a href="/about" className="text-muted-foreground hover:text-foreground transition-colors">About</a></li>
-                    <li><a href="/api-docs" className="text-muted-foreground hover:text-foreground transition-colors">API Documentation</a></li>
                     <li><a href="/help" className="text-muted-foreground hover:text-foreground transition-colors">Help & Contact</a></li>
                   </ul>
                 </div>
