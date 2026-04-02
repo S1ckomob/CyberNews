@@ -3,13 +3,16 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
+import { csrfHeaders } from "@/lib/csrf-client";
 import {
   LayoutDashboard, Sparkles, Clock, Bug, Lock, Shield, Monitor,
   Search, Users, Eye, Bookmark, BarChart3, Bell, Zap, FileDown,
-  Keyboard, HelpCircle, ExternalLink, Command,
+  Keyboard, HelpCircle, ExternalLink, Command, Send, CheckCircle,
+  Loader2, MessageSquare,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -212,6 +215,147 @@ export default function HelpPage() {
           );
         })}
       </div>
+
+      {/* Contact Form */}
+      <Separator className="my-8" />
+      <ContactForm />
     </div>
+  );
+}
+
+function ContactForm() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [feedback, setFeedback] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name || !email || !subject || !message) return;
+
+    setStatus("loading");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: csrfHeaders(),
+        body: JSON.stringify({ name, email, subject, message }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setStatus("success");
+        setFeedback(data.message);
+        setName(""); setEmail(""); setSubject(""); setMessage("");
+      } else {
+        setStatus("error");
+        setFeedback(data.error || "Something went wrong");
+      }
+    } catch {
+      setStatus("error");
+      setFeedback("Failed to send. Please try again.");
+    }
+  }
+
+  if (status === "success") {
+    return (
+      <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
+        <CardContent className="p-6 text-center">
+          <CheckCircle className="h-8 w-8 text-primary mx-auto mb-3" />
+          <h2 className="text-lg font-semibold mb-1">Message Sent</h2>
+          <p className="text-sm text-muted-foreground">{feedback}</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <section>
+      <div className="flex items-center gap-2 mb-4">
+        <MessageSquare className="h-5 w-5 text-primary" />
+        <h2 className="text-lg font-semibold tracking-tight">Contact Us</h2>
+      </div>
+      <p className="text-sm text-muted-foreground mb-6">
+        Have a question, feedback, or partnership inquiry? Send us a message and we'll get back to you.
+      </p>
+
+      <Card>
+        <CardContent className="p-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label htmlFor="contact-name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1.5">
+                  Name
+                </label>
+                <Input
+                  id="contact-name"
+                  value={name}
+                  onChange={(e) => { setName(e.target.value); setStatus("idle"); }}
+                  placeholder="Your name"
+                  required
+                  maxLength={100}
+                />
+              </div>
+              <div>
+                <label htmlFor="contact-email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1.5">
+                  Email
+                </label>
+                <Input
+                  id="contact-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); setStatus("idle"); }}
+                  placeholder="you@company.com"
+                  required
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="contact-subject" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1.5">
+                Subject
+              </label>
+              <Input
+                id="contact-subject"
+                value={subject}
+                onChange={(e) => { setSubject(e.target.value); setStatus("idle"); }}
+                placeholder="What's this about?"
+                required
+                maxLength={200}
+              />
+            </div>
+            <div>
+              <label htmlFor="contact-message" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1.5">
+                Message
+              </label>
+              <textarea
+                id="contact-message"
+                value={message}
+                onChange={(e) => { setMessage(e.target.value); setStatus("idle"); }}
+                placeholder="Tell us more..."
+                required
+                minLength={10}
+                maxLength={5000}
+                rows={5}
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-y"
+              />
+              <p className="text-[10px] text-muted-foreground mt-1 text-right">{message.length}/5000</p>
+            </div>
+
+            {status === "error" && (
+              <p className="text-sm text-destructive">{feedback}</p>
+            )}
+
+            <Button type="submit" disabled={status === "loading"} className="gap-2">
+              {status === "loading" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+              {status === "loading" ? "Sending..." : "Send Message"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </section>
   );
 }

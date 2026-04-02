@@ -34,7 +34,7 @@ export default async function HomePage() {
       a.exploitedAt
   );
 
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com";
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",

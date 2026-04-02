@@ -55,7 +55,7 @@ function articleMatchesRule(article: AlertArticle, rule: AlertRule): boolean {
 }
 
 function buildAlertEmail(articles: AlertArticle[], rule: AlertRule): string {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com";
   const matchDesc = [
     ...rule.products.map((p) => p),
     ...rule.actors.map((a) => a),

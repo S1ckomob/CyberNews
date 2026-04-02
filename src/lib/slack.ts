@@ -19,7 +19,7 @@ export async function sendSlackAlert(articles: SlackArticle[]) {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
   if (!webhookUrl || articles.length === 0) return;
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com";
 
   // Only alert on critical, high, or zero-day
   const urgent = articles.filter(

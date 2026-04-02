@@ -61,7 +61,7 @@ function buildEmailHtml(articles: DigestArticle[], date: string) {
           <span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;font-family:monospace;letter-spacing:0.05em;color:${threatColor(a.threat_level)};background:${threatColor(a.threat_level)}15;border:1px solid ${threatColor(a.threat_level)}30">${threatLabel(a.threat_level)}</span>
           <span style="margin-left:8px;font-size:11px;color:#64748b;font-family:monospace">${safeCategory}</span>
           <br/>
-          <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app"}/article/${safeSlug}" style="color:#e2e8f0;text-decoration:none;font-size:14px;font-weight:600;line-height:1.4">${safeTitle}</a>
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com"}/article/${safeSlug}" style="color:#e2e8f0;text-decoration:none;font-size:14px;font-weight:600;line-height:1.4">${safeTitle}</a>
           <br/>
           ${cveText}
           <span style="font-size:12px;color:#94a3b8;line-height:1.5">${safeSummary}</span>
@@ -129,7 +129,7 @@ function buildEmailHtml(articles: DigestArticle[], date: string) {
 
 <!-- Footer -->
 <tr><td style="padding:16px 24px;border-top:1px solid #1e293b;text-align:center">
-  <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app"}/intelligence" style="color:#3b82f6;text-decoration:none;font-size:13px;font-weight:600">Open Full Dashboard →</a>
+  <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com"}/intelligence" style="color:#3b82f6;text-decoration:none;font-size:13px;font-weight:600">Open Full Dashboard →</a>
   <br/>
   <span style="font-size:11px;color:#475569;line-height:2">Security Intel Hub — Institutional Cybersecurity Intelligence</span>
 </td></tr>

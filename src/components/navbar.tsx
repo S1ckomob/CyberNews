@@ -41,7 +41,6 @@ const primaryNav = [
   { name: "Intelligence", href: "/intelligence" },
   { name: "CVEs", href: "/cve" },
   { name: "Threat Actors", href: "/threat-actors" },
-  { name: "Alerts", href: "/alerts" },
 ];
 
 const moreNav = [
@@ -61,7 +60,6 @@ const allNav = [
   { name: "Intelligence", href: "/intelligence", icon: BarChart3 },
   { name: "CVEs", href: "/cve", icon: Search },
   { name: "Threat Actors", href: "/threat-actors", icon: Users },
-  { name: "Alerts", href: "/alerts", icon: Bell },
   { name: "Threat Map", href: "/map", icon: Globe },
   { name: "Attack Surface", href: "/attack-surface", icon: Target },
   { name: "Executive", href: "/executive", icon: BarChart3 },

@@ -43,7 +43,6 @@ const PAGES = [
   { name: "Microsoft", href: "/intelligence?view=microsoft", icon: Monitor },
   { name: "CVE Search", href: "/cve", icon: Search },
   { name: "Threat Actors", href: "/threat-actors", icon: Users },
-  { name: "Alerts", href: "/alerts", icon: AlertTriangle },
   { name: "Threat Map", href: "/map", icon: Globe },
   { name: "Attack Surface", href: "/attack-surface", icon: Shield },
   { name: "Executive Summary", href: "/executive", icon: FileText },

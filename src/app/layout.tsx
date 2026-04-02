@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

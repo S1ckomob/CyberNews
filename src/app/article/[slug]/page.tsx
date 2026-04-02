@@ -64,7 +64,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const article = await fetchArticleBySlug(slug);
   if (!article) return { title: "Not Found" };
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com";
   return {
     title: article.title,
     description: article.summary,
@@ -135,7 +135,7 @@ export default async function ArticlePage({
     article.patchedAt && { label: "Patch Available", date: article.patchedAt },
   ].filter(Boolean) as { label: string; date: string }[];
 
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com";
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",

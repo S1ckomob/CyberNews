@@ -1,6 +1,6 @@
 import { getSupabase } from "@/lib/supabase";
 
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com";
 
 const STATIC_PAGES = [
   { path: "", priority: "1.0", changefreq: "hourly" },

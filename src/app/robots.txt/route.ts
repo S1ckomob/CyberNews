@@ -1,4 +1,4 @@
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com";
 
 export function GET() {
   const body = `User-agent: *
