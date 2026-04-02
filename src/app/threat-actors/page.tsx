@@ -3,6 +3,8 @@ export const revalidate = 60;
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ActorGraph } from "@/components/actor-graph";
 import { fetchThreatActors, fetchArticles } from "@/lib/queries";
 import { Users, Globe, Calendar, Target, ChevronRight } from "lucide-react";
 
@@ -26,6 +28,18 @@ export default async function ThreatActorsPage() {
           Active threat groups tracked by our intelligence team
         </p>
       </div>
+
+      {/* Relationship Graph */}
+      <Card className="mb-6">
+        <CardContent className="p-4">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+            Threat Actor Relationships
+          </h2>
+          <ActorGraph actors={threatActors} articles={articles} />
+        </CardContent>
+      </Card>
+
+      <Separator className="mb-6" />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {threatActors.map((actor) => {

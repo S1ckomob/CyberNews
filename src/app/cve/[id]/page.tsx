@@ -18,6 +18,10 @@ import {
   Clock,
   Flame,
   ChevronRight,
+  Code,
+  CheckCircle,
+  XCircle,
+  Wrench,
 } from "lucide-react";
 
 interface NVDData {
@@ -94,6 +98,27 @@ async function fetchNVDData(cveId: string): Promise<NVDData | null> {
   }
 }
 
+async function fetchGitHubPoCCount(cveId: string): Promise<number> {
+  try {
+    const res = await fetch(
+      `https://api.github.com/search/repositories?q=${cveId}&per_page=1`,
+      { next: { revalidate: 3600 } }
+    );
+    if (!res.ok) return 0;
+    const data = await res.json();
+    return data.total_count || 0;
+  } catch {
+    return 0;
+  }
+}
+
+function derivePatchStatus(nvd: NVDData | null, articles: { patchedAt?: string }[]): "patched" | "workaround" | "unpatched" {
+  if (articles.some((a) => a.patchedAt)) return "patched";
+  if (nvd?.references.some((r) => r.tags.includes("Patch") || r.tags.includes("Vendor Advisory"))) return "patched";
+  if (nvd?.references.some((r) => r.tags.includes("Mitigation") || r.tags.includes("Workaround"))) return "workaround";
+  return "unpatched";
+}
+
 function severityColor(severity: string | null): string {
   switch (severity?.toUpperCase()) {
     case "CRITICAL": return "text-threat-critical";
@@ -132,9 +157,10 @@ export default async function CVEDetailPage({
   const { id } = await params;
   const cveId = id.toUpperCase();
 
-  const [nvdData, articles] = await Promise.all([
+  const [nvdData, articles, pocCount] = await Promise.all([
     fetchNVDData(cveId),
     fetchArticles(),
+    fetchGitHubPoCCount(cveId),
   ]);
 
   const relatedArticles = articles.filter((a) =>
@@ -142,6 +168,7 @@ export default async function CVEDetailPage({
   );
 
   const exploited = relatedArticles.some((a) => a.exploitedAt);
+  const patchStatus = derivePatchStatus(nvdData, relatedArticles);
   const affectedProducts = [...new Set(relatedArticles.flatMap((a) => a.affectedProducts))];
   const linkedActors = [...new Set(relatedArticles.flatMap((a) => a.threatActors).filter(Boolean))];
 
@@ -402,18 +429,55 @@ export default async function CVEDetailPage({
             </Card>
           )}
 
-          {/* Exploitation Status */}
+          {/* Exploitation & Patch Status */}
           <Card className={exploited ? "border-threat-critical/30 bg-threat-critical/5" : ""}>
-            <CardContent className="p-4">
-              <h3 className="text-xs font-semibold uppercase tracking-wider mb-2">
-                Exploitation Status
-              </h3>
-              <div className={`flex items-center gap-2 text-sm font-semibold ${exploited ? "text-threat-critical" : "text-muted-foreground"}`}>
-                {exploited ? (
-                  <><Flame className="h-4 w-4" /> Exploited in the Wild</>
-                ) : (
-                  <><Shield className="h-4 w-4" /> No Known Exploitation</>
-                )}
+            <CardContent className="p-4 space-y-3">
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-wider mb-2">
+                  Exploitation
+                </h3>
+                <div className={`flex items-center gap-2 text-sm font-semibold ${exploited ? "text-threat-critical" : "text-muted-foreground"}`}>
+                  {exploited ? (
+                    <><Flame className="h-4 w-4" /> Exploited in the Wild</>
+                  ) : (
+                    <><Shield className="h-4 w-4" /> No Known Exploitation</>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-wider mb-2">
+                  Patch Status
+                </h3>
+                <div className={`flex items-center gap-2 text-sm font-semibold ${
+                  patchStatus === "patched" ? "text-primary" :
+                  patchStatus === "workaround" ? "text-threat-medium" :
+                  "text-threat-critical"
+                }`}>
+                  {patchStatus === "patched" ? (
+                    <><CheckCircle className="h-4 w-4" /> Patch Available</>
+                  ) : patchStatus === "workaround" ? (
+                    <><Wrench className="h-4 w-4" /> Workaround Only</>
+                  ) : (
+                    <><XCircle className="h-4 w-4" /> No Patch Available</>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-wider mb-2">
+                  Public Exploits
+                </h3>
+                <div className={`flex items-center gap-2 text-sm font-semibold ${pocCount > 0 ? "text-threat-high" : "text-muted-foreground"}`}>
+                  <Code className="h-4 w-4" />
+                  {pocCount > 0 ? (
+                    <a href={`https://github.com/search?q=${cveId}&type=repositories`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                      {pocCount} PoC{pocCount !== 1 ? "s" : ""} on GitHub
+                    </a>
+                  ) : (
+                    "No public PoCs found"
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
