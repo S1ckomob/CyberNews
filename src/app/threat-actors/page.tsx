@@ -11,7 +11,7 @@ import { Users, Globe, Calendar, Target, ChevronRight } from "lucide-react";
 export const metadata = {
   title: "Threat Actor Profiles",
   description:
-    "Profiles of active threat actors tracked by CyberIntel intelligence analysts.",
+    "Profiles of active threat actors tracked by Security Standard intelligence analysts.",
 };
 
 export default async function ThreatActorsPage() {

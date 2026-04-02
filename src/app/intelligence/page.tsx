@@ -12,6 +12,7 @@ import { ThreatBadge } from "@/components/threat-badge";
 import { supabase } from "@/lib/supabase";
 import type { Article, ThreatLevel, Category, Industry } from "@/lib/types";
 import type { ArticleRow } from "@/lib/supabase";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import {
   Search,
   SlidersHorizontal,
@@ -23,6 +24,7 @@ import {
   Shield,
   BarChart3,
   RefreshCw,
+  PanelRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -112,11 +114,18 @@ export default function DashboardPage() {
 
   useEffect(() => {
     load();
-    const channel = supabase
-      .channel("articles-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "articles" }, () => load())
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    if (!supabase) return;
+
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    try {
+      channel = supabase
+        .channel("articles-realtime")
+        .on("postgres_changes", { event: "*", schema: "public", table: "articles" }, () => load())
+        .subscribe();
+    } catch {
+      // WebSocket may not be available in all environments
+    }
+    return () => { if (channel) supabase.removeChannel(channel); };
   }, []);
 
   const filteredArticles = useMemo(() => {
@@ -162,6 +171,114 @@ export default function DashboardPage() {
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, [articles]);
 
+  const zeroDayArticles = articles.filter((a) => a.category === "zero-day" || a.tags.some((t) => t.includes("zero-day")));
+  const criticalArticles = articles.filter((a) => a.threatLevel === "critical");
+
+  const sidebarContent = (
+    <>
+      {/* Zero-Day Alerts */}
+      {zeroDayArticles.length > 0 && (
+        <Card className="border-threat-critical/30 bg-threat-critical/5">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Bug className="h-4 w-4 text-threat-critical animate-threat-pulse" />
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-threat-critical">
+                Active Zero-Days
+              </h3>
+            </div>
+            <div className="space-y-1">
+              {zeroDayArticles.slice(0, 5).map((a) => (
+                <ArticleCard key={a.id} article={a} variant="compact" />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Critical Alerts */}
+      <Card className="border-threat-critical/20">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle className="h-4 w-4 text-threat-critical" />
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-threat-critical">
+              Critical Alerts
+            </h3>
+          </div>
+          <div className="space-y-1">
+            {criticalArticles.slice(0, 5).map((a) => (
+              <ArticleCard key={a.id} article={a} variant="compact" />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Category Breakdown */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <BarChart3 className="h-4 w-4 text-primary" />
+            <h3 className="text-xs font-semibold uppercase tracking-wider">
+              By Category
+            </h3>
+          </div>
+          <div className="space-y-2">
+            {categoryCounts.slice(0, 8).map(([cat, count]) => (
+              <button
+                key={cat}
+                onClick={() => toggleFilter(categoryFilters, cat as Category, setCategoryFilters)}
+                className="flex items-center justify-between w-full text-xs hover:bg-accent rounded px-2 py-1 transition-colors"
+              >
+                <span className="capitalize text-muted-foreground">{cat.replace("-", " ")}</span>
+                <div className="flex items-center gap-2">
+                  <div className="h-1.5 rounded-full bg-primary/20 w-16">
+                    <div
+                      className="h-1.5 rounded-full bg-primary"
+                      style={{ width: `${Math.min(100, (count / articles.length) * 100)}%` }}
+                    />
+                  </div>
+                  <span className="font-mono font-medium text-foreground w-6 text-right">{count}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Trending */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp className="h-4 w-4 text-primary" />
+            <h3 className="text-xs font-semibold uppercase tracking-wider">Trending</h3>
+          </div>
+          <div className="space-y-1">
+            {articles.slice(0, 6).map((a) => (
+              <ArticleCard key={a.id} article={a} variant="compact" />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Sources */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Shield className="h-4 w-4 text-muted-foreground" />
+            <h3 className="text-xs font-semibold uppercase tracking-wider">Sources</h3>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {[...allSources].slice(0, 12).map((s) => (
+              <Badge key={s} variant="secondary" className="text-[10px]">{s}</Badge>
+            ))}
+            {allSources.size > 12 && (
+              <Badge variant="secondary" className="text-[10px]">+{allSources.size - 12} more</Badge>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </>
+  );
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       {/* Header */}
@@ -196,7 +313,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 mb-6">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:grid-cols-6 mb-6">
         <Card className="border-threat-critical/20 bg-threat-critical/5">
           <CardContent className="p-3 text-center">
             <div className="text-xl font-mono font-bold text-threat-critical">{criticalCount}</div>
@@ -324,6 +441,22 @@ export default function DashboardPage() {
       )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
+        {/* Mobile sidebar trigger */}
+        <div className="lg:hidden flex justify-end -mt-2 mb-1">
+          <Sheet>
+            <SheetTrigger className="inline-flex items-center justify-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent transition-colors">
+              <PanelRight className="h-3.5 w-3.5" />
+              Insights
+            </SheetTrigger>
+            <SheetContent side="right" className="w-80 overflow-y-auto">
+              <SheetTitle className="sr-only">Intelligence Insights</SheetTitle>
+              <div className="mt-4 space-y-4">
+                {sidebarContent}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+
         {/* Main Feed */}
         <div>
           <div className="flex items-center justify-between mb-3">
@@ -361,114 +494,9 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Sidebar */}
-        <aside className="space-y-4">
-          {/* Zero-Day Alerts */}
-          {articles.filter((a) => a.category === "zero-day" || a.tags.some((t) => t.includes("zero-day"))).length > 0 && (
-            <Card className="border-threat-critical/30 bg-threat-critical/5">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Bug className="h-4 w-4 text-threat-critical animate-threat-pulse" />
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-threat-critical">
-                    Active Zero-Days
-                  </h3>
-                </div>
-                <div className="space-y-1">
-                  {articles
-                    .filter((a) => a.category === "zero-day" || a.tags.some((t) => t.includes("zero-day")))
-                    .slice(0, 5)
-                    .map((a) => (
-                      <ArticleCard key={a.id} article={a} variant="compact" />
-                    ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Critical Alerts */}
-          <Card className="border-threat-critical/20">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <AlertTriangle className="h-4 w-4 text-threat-critical" />
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-threat-critical">
-                  Critical Alerts
-                </h3>
-              </div>
-              <div className="space-y-1">
-                {articles
-                  .filter((a) => a.threatLevel === "critical")
-                  .slice(0, 5)
-                  .map((a) => (
-                    <ArticleCard key={a.id} article={a} variant="compact" />
-                  ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Category Breakdown */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <BarChart3 className="h-4 w-4 text-primary" />
-                <h3 className="text-xs font-semibold uppercase tracking-wider">
-                  By Category
-                </h3>
-              </div>
-              <div className="space-y-2">
-                {categoryCounts.slice(0, 8).map(([cat, count]) => (
-                  <button
-                    key={cat}
-                    onClick={() => toggleFilter(categoryFilters, cat as Category, setCategoryFilters)}
-                    className="flex items-center justify-between w-full text-xs hover:bg-accent rounded px-2 py-1 transition-colors"
-                  >
-                    <span className="capitalize text-muted-foreground">{cat.replace("-", " ")}</span>
-                    <div className="flex items-center gap-2">
-                      <div className="h-1.5 rounded-full bg-primary/20 w-16">
-                        <div
-                          className="h-1.5 rounded-full bg-primary"
-                          style={{ width: `${Math.min(100, (count / articles.length) * 100)}%` }}
-                        />
-                      </div>
-                      <span className="font-mono font-medium text-foreground w-6 text-right">{count}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Trending */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <TrendingUp className="h-4 w-4 text-primary" />
-                <h3 className="text-xs font-semibold uppercase tracking-wider">Trending</h3>
-              </div>
-              <div className="space-y-1">
-                {articles.slice(0, 6).map((a) => (
-                  <ArticleCard key={a.id} article={a} variant="compact" />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Sources */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Shield className="h-4 w-4 text-muted-foreground" />
-                <h3 className="text-xs font-semibold uppercase tracking-wider">Sources</h3>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {[...allSources].slice(0, 12).map((s) => (
-                  <Badge key={s} variant="secondary" className="text-[10px]">{s}</Badge>
-                ))}
-                {allSources.size > 12 && (
-                  <Badge variant="secondary" className="text-[10px]">+{allSources.size - 12} more</Badge>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+        {/* Sidebar — desktop only, mobile uses Sheet above */}
+        <aside className="hidden lg:block space-y-4" aria-label="Intelligence insights">
+          {sidebarContent}
         </aside>
       </div>
     </div>

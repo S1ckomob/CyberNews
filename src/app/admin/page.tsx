@@ -24,7 +24,24 @@ import {
   CheckCircle,
   Clock,
   Pencil,
+  Lock,
 } from "lucide-react";
+import { csrfHeaders } from "@/lib/csrf-client";
+
+function getAdminKey(): string {
+  if (typeof window === "undefined") return "";
+  return document.cookie
+    .split("; ")
+    .find((c) => c.startsWith("admin-key="))
+    ?.split("=")[1] || "";
+}
+
+function adminHeaders(): HeadersInit {
+  return {
+    ...csrfHeaders(),
+    "x-admin-key": getAdminKey(),
+  };
+}
 
 const CATEGORIES: Category[] = [
   "vulnerability", "malware", "ransomware", "data-breach", "apt",
@@ -43,9 +60,54 @@ function formatDate(d: string) {
 }
 
 export default function AdminPage() {
+  const [authed, setAuthed] = useState(false);
+  const [keyInput, setKeyInput] = useState("");
+  const [authError, setAuthError] = useState("");
+
   const [articles, setArticles] = useState<ArticleRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"articles" | "create" | "classify" | "ingest">("articles");
+
+  // Check for existing auth cookie on mount
+  useEffect(() => {
+    if (getAdminKey()) setAuthed(true);
+  }, []);
+
+  function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    const key = keyInput.trim();
+    if (!key) return;
+    document.cookie = `admin-key=${key}; path=/; SameSite=Strict; max-age=86400`;
+    // Reload to let the proxy verify the cookie
+    window.location.reload();
+  }
+
+  if (!authed) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-24">
+        <Card>
+          <CardContent className="pt-6 space-y-4">
+            <div className="flex items-center gap-2 text-lg font-semibold">
+              <Lock className="h-5 w-5" /> Admin Login
+            </div>
+            <form onSubmit={handleLogin} className="space-y-3">
+              <Input
+                type="password"
+                placeholder="Enter admin key"
+                value={keyInput}
+                onChange={(e) => setKeyInput(e.target.value)}
+                autoFocus
+              />
+              {authError && (
+                <p className="text-sm text-destructive">{authError}</p>
+              )}
+              <Button type="submit" className="w-full">Authenticate</Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // Create form state
   const [form, setForm] = useState({
@@ -83,7 +145,7 @@ export default function AdminPage() {
   async function deleteArticle(id: string) {
     await fetch("/api/admin/articles", {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: adminHeaders(),
       body: JSON.stringify({ id }),
     });
     setArticles((prev) => prev.filter((a) => a.id !== id));
@@ -100,7 +162,7 @@ export default function AdminPage() {
 
     const res = await fetch("/api/admin/articles", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: adminHeaders(),
       body: JSON.stringify({
         title: form.title,
         slug: slugify(form.title),
@@ -146,7 +208,7 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/classify", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: adminHeaders(),
         body: JSON.stringify({
           raw_text: rawText,
           source: classifySource,
@@ -169,7 +231,7 @@ export default function AdminPage() {
     setIngesting(true);
     setIngestResult(null);
     try {
-      const res = await fetch("/api/ingest", { method: "POST" });
+      const res = await fetch("/api/ingest", { method: "POST", headers: adminHeaders() });
       const data = await res.json();
       setIngestResult(data);
       if (data.total > 0) loadArticles();

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Shield, Lock, CheckCircle, Loader2 } from "lucide-react";
+import { csrfHeaders } from "@/lib/csrf-client";
 
 const STORAGE_KEY = "cyberintel-subscribed-email";
 
@@ -46,12 +47,13 @@ export function SubscribeGate({
     try {
       const res = await fetch("/api/subscribe", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: csrfHeaders(),
         body: JSON.stringify({ email }),
       });
       const data = await res.json();
       if (data.success) {
         markSubscribed(email);
+        localStorage.setItem("cyberintel-alert-email", email);
         setStatus("success");
         // Reload to show the content
         window.location.reload();

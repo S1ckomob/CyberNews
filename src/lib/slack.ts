@@ -19,7 +19,7 @@ export async function sendSlackAlert(articles: SlackArticle[]) {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
   if (!webhookUrl || articles.length === 0) return;
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.app";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app";
 
   // Only alert on critical, high, or zero-day
   const urgent = articles.filter(
@@ -36,7 +36,7 @@ export async function sendSlackAlert(articles: SlackArticle[]) {
       type: "header",
       text: {
         type: "plain_text",
-        text: `🛡 CyberIntel Alert — ${urgent.length} New Threat${urgent.length > 1 ? "s" : ""}`,
+        text: `🛡 Security Standard Alert — ${urgent.length} New Threat${urgent.length > 1 ? "s" : ""}`,
       },
     },
   ];

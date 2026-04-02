@@ -26,6 +26,8 @@ export function ThreatTicker() {
   >([]);
 
   useEffect(() => {
+    if (!supabase) return;
+
     async function load() {
       const { data } = await supabase
         .from("articles")
@@ -36,12 +38,17 @@ export function ThreatTicker() {
     }
     load();
 
-    const channel = supabase
-      .channel("ticker-realtime")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "articles" }, () => load())
-      .subscribe();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    try {
+      channel = supabase
+        .channel("ticker-realtime")
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "articles" }, () => load())
+        .subscribe();
+    } catch {
+      // WebSocket may not be available in all environments
+    }
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { if (channel) supabase.removeChannel(channel); };
   }, []);
 
   if (articles.length === 0) return null;

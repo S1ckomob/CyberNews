@@ -3,6 +3,9 @@ import { XMLParser } from "fast-xml-parser";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
 import { sendSlackAlert } from "@/lib/slack";
 import { sendPersonalizedAlerts } from "@/lib/alert-matcher";
+import { requireApiAuth } from "@/lib/api-auth";
+import { logAudit } from "@/lib/audit";
+import { rateLimit } from "@/lib/rate-limit";
 
 // ---------- Types ----------
 
@@ -159,7 +162,7 @@ const RSS_FEEDS: RSSFeedConfig[] = [
 
 async function fetchRSSFeed(config: RSSFeedConfig): Promise<IngestArticle[]> {
   const res = await fetch(config.url, {
-    headers: { "User-Agent": "CyberIntel/1.0 (RSS Aggregator)" },
+    headers: { "User-Agent": "SecurityStandard/1.0 (RSS Aggregator)" },
     next: { revalidate: 0 },
   });
   if (!res.ok) return [];
@@ -395,20 +398,12 @@ async function fetchNVDRecent(): Promise<IngestArticle[]> {
 // ---------- Main Handler ----------
 
 export async function POST(request: NextRequest) {
-  // Auth: accept Bearer token, Vercel CRON_SECRET, or skip if no key configured
-  const authHeader = request.headers.get("authorization");
-  const cronSecret = request.headers.get("x-vercel-cron-secret");
-  const apiKey = process.env.INGEST_API_KEY?.trim();
-  const vercelCronSecret = process.env.CRON_SECRET?.trim();
+  const rateLimitError = await rateLimit(request, "heavy");
+  if (rateLimitError) return rateLimitError;
 
-  const isAuthed =
-    !apiKey ||
-    authHeader === `Bearer ${apiKey}` ||
-    (vercelCronSecret && cronSecret === vercelCronSecret);
-
-  if (!isAuthed) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  // Auth: require Bearer token or Vercel CRON_SECRET
+  const authError = requireApiAuth(request);
+  if (authError) return authError;
 
   const results: Record<string, number> = {};
   const errors: string[] = [];
@@ -478,6 +473,8 @@ export async function POST(request: NextRequest) {
       sendPersonalizedAlerts(newlyInserted).catch(() => {}),
     ]);
   }
+
+  logAudit(request, "ingest.run", { total: totalInserted, sources_checked: RSS_FEEDS.length + 2 });
 
   return NextResponse.json({
     success: true,

@@ -8,13 +8,27 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ThreatBadge } from "@/components/threat-badge";
 import type { ThreatLevel } from "@/lib/types";
+import { csrfHeaders } from "@/lib/csrf-client";
 import {
   Bell, Plus, X, CheckCircle, Loader2, Mail,
-  Shield, Users, Box, AlertTriangle,
+  Shield, Users, Box, AlertTriangle, Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const SEVERITY_OPTIONS: ThreatLevel[] = ["critical", "high", "medium", "low"];
+
+const CATEGORY_OPTIONS = [
+  { value: "vulnerability", label: "Vulnerabilities" },
+  { value: "malware", label: "Malware" },
+  { value: "ransomware", label: "Ransomware" },
+  { value: "data-breach", label: "Data Breach" },
+  { value: "apt", label: "APT" },
+  { value: "zero-day", label: "Zero-Day" },
+  { value: "supply-chain", label: "Supply Chain" },
+  { value: "phishing", label: "Phishing" },
+  { value: "insider-threat", label: "Insider Threat" },
+  { value: "ddos", label: "DDoS" },
+];
 
 const SUGGESTED_PRODUCTS = [
   "FortiGate", "FortiOS", "FortiManager", "PAN-OS", "GlobalProtect",
@@ -36,6 +50,7 @@ export default function AlertsPage() {
   const [products, setProducts] = useState<string[]>([]);
   const [actors, setActors] = useState<string[]>([]);
   const [severity, setSeverity] = useState<string[]>(["critical", "high"]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [newProduct, setNewProduct] = useState("");
   const [newActor, setNewActor] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "saved" | "error">("idle");
@@ -55,6 +70,7 @@ export default function AlertsPage() {
             setProducts(data.rules.products || []);
             setActors(data.rules.actors || []);
             setSeverity(data.rules.severity || ["critical", "high"]);
+            setCategories(data.rules.categories || []);
           }
           setLoaded(true);
         })
@@ -84,6 +100,14 @@ export default function AlertsPage() {
     );
   }
 
+  function toggleCategory(cat: string) {
+    setCategories(
+      categories.includes(cat)
+        ? categories.filter((c) => c !== cat)
+        : [...categories, cat]
+    );
+  }
+
   async function handleSave() {
     if (!email || !email.includes("@")) {
       setStatus("error");
@@ -100,8 +124,8 @@ export default function AlertsPage() {
     try {
       const res = await fetch("/api/alerts", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, products, actors, severity }),
+        headers: csrfHeaders(),
+        body: JSON.stringify({ email, products, actors, severity, categories }),
       });
       const data = await res.json();
       if (data.success) {
@@ -169,6 +193,36 @@ export default function AlertsPage() {
               >
                 <ThreatBadge level={level} />
               </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Categories */}
+      <Card className="mb-4">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Tag className="h-4 w-4 text-primary" />
+            <h3 className="text-xs font-semibold uppercase tracking-wider">
+              Categories
+            </h3>
+            <span className="text-[10px] text-muted-foreground">(none selected = all categories)</span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {CATEGORY_OPTIONS.map((cat) => (
+              <Badge
+                key={cat.value}
+                variant="outline"
+                className={cn(
+                  "cursor-pointer text-xs transition-all",
+                  categories.includes(cat.value)
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "hover:bg-accent"
+                )}
+                onClick={() => toggleCategory(cat.value)}
+              >
+                {cat.label}
+              </Badge>
             ))}
           </div>
         </CardContent>
@@ -278,6 +332,12 @@ export default function AlertsPage() {
               <Shield className="h-3 w-3 text-primary" />
               Severity: {severity.length > 0 ? severity.map((s) => s.toUpperCase()).join(", ") : "None selected"}
             </li>
+            {categories.length > 0 && (
+              <li className="flex items-center gap-2">
+                <Tag className="h-3 w-3 text-primary" />
+                Categories: {categories.map((c) => c.replace("-", " ")).join(", ")}
+              </li>
+            )}
             {products.length > 0 && (
               <li className="flex items-center gap-2">
                 <Box className="h-3 w-3 text-primary" />
@@ -290,10 +350,10 @@ export default function AlertsPage() {
                 Actors: {actors.join(", ")}
               </li>
             )}
-            {products.length === 0 && actors.length === 0 && (
+            {categories.length === 0 && products.length === 0 && actors.length === 0 && (
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Box className="h-3 w-3" />
-                All {severity.join("/")} threats (no product/actor filter)
+                All {severity.join("/")} threats (no category/product/actor filter)
               </li>
             )}
           </ul>

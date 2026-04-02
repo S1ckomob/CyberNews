@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function GET(request: NextRequest) {
+  const rateLimitError = await rateLimit(request, "public");
+  if (rateLimitError) return rateLimitError;
+
   const q = request.nextUrl.searchParams.get("q")?.trim();
-  if (!q || q.length < 2) {
+  if (!q || q.length < 2 || q.length > 200) {
     return NextResponse.json({ articles: [], actors: [], cves: [] });
   }
 

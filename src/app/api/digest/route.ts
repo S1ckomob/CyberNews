@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
+import { requireApiAuth } from "@/lib/api-auth";
+import { logAudit } from "@/lib/audit";
+import { rateLimit } from "@/lib/rate-limit";
 
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY);
@@ -30,25 +33,40 @@ function threatLabel(level: string) {
   return level.toUpperCase();
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function buildEmailHtml(articles: DigestArticle[], date: string) {
   const criticalArticles = articles.filter((a) => a.threat_level === "critical");
   const highArticles = articles.filter((a) => a.threat_level === "high");
   const otherArticles = articles.filter((a) => a.threat_level !== "critical" && a.threat_level !== "high");
 
   function articleRow(a: DigestArticle) {
-    const cveText = a.cves.length > 0 ? `<span style="font-family:monospace;color:#ea580c;font-size:12px">${a.cves.slice(0, 2).join(", ")}</span><br/>` : "";
+    const safeCves = a.cves.slice(0, 2).map(escapeHtml).join(", ");
+    const cveText = a.cves.length > 0 ? `<span style="font-family:monospace;color:#ea580c;font-size:12px">${safeCves}</span><br/>` : "";
+    const safeTitle = escapeHtml(a.title);
+    const safeSummary = escapeHtml(a.summary.slice(0, 200)) + (a.summary.length > 200 ? "..." : "");
+    const safeSource = escapeHtml(a.source);
+    const safeCategory = escapeHtml(a.category.replace("-", " "));
+    const safeSlug = encodeURIComponent(a.slug);
     return `
       <tr>
         <td style="padding:12px 0;border-bottom:1px solid #1e293b">
           <span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;font-family:monospace;letter-spacing:0.05em;color:${threatColor(a.threat_level)};background:${threatColor(a.threat_level)}15;border:1px solid ${threatColor(a.threat_level)}30">${threatLabel(a.threat_level)}</span>
-          <span style="margin-left:8px;font-size:11px;color:#64748b;font-family:monospace">${a.category.replace("-", " ")}</span>
+          <span style="margin-left:8px;font-size:11px;color:#64748b;font-family:monospace">${safeCategory}</span>
           <br/>
-          <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.app"}/article/${a.slug}" style="color:#e2e8f0;text-decoration:none;font-size:14px;font-weight:600;line-height:1.4">${a.title}</a>
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app"}/article/${safeSlug}" style="color:#e2e8f0;text-decoration:none;font-size:14px;font-weight:600;line-height:1.4">${safeTitle}</a>
           <br/>
           ${cveText}
-          <span style="font-size:12px;color:#94a3b8;line-height:1.5">${a.summary.slice(0, 200)}${a.summary.length > 200 ? "..." : ""}</span>
+          <span style="font-size:12px;color:#94a3b8;line-height:1.5">${safeSummary}</span>
           <br/>
-          <span style="font-size:11px;color:#64748b">${a.source} &middot; ${new Date(a.published_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+          <span style="font-size:11px;color:#64748b">${safeSource} &middot; ${new Date(a.published_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
         </td>
       </tr>`;
   }
@@ -74,7 +92,7 @@ function buildEmailHtml(articles: DigestArticle[], date: string) {
 <!-- Header -->
 <tr><td style="padding:24px 24px 16px">
   <table width="100%"><tr>
-    <td><span style="font-size:16px;font-weight:700;color:#e2e8f0">🛡 CyberIntel Daily Briefing</span></td>
+    <td><span style="font-size:16px;font-weight:700;color:#e2e8f0">🛡 Security Standard Daily Briefing</span></td>
     <td align="right"><span style="font-size:12px;color:#64748b">${date}</span></td>
   </tr></table>
   <p style="margin:8px 0 0;font-size:13px;color:#94a3b8">Top threats from the last 24 hours. ${articles.length} reports from verified sources.</p>
@@ -111,9 +129,9 @@ function buildEmailHtml(articles: DigestArticle[], date: string) {
 
 <!-- Footer -->
 <tr><td style="padding:16px 24px;border-top:1px solid #1e293b;text-align:center">
-  <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.app"}/intelligence" style="color:#3b82f6;text-decoration:none;font-size:13px;font-weight:600">Open Full Dashboard →</a>
+  <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app"}/intelligence" style="color:#3b82f6;text-decoration:none;font-size:13px;font-weight:600">Open Full Dashboard →</a>
   <br/>
-  <span style="font-size:11px;color:#475569;line-height:2">CyberIntel — Institutional Cybersecurity Intelligence</span>
+  <span style="font-size:11px;color:#475569;line-height:2">Security Standard — Institutional Cybersecurity Intelligence</span>
 </td></tr>
 
 </table>
@@ -124,20 +142,12 @@ function buildEmailHtml(articles: DigestArticle[], date: string) {
 }
 
 export async function POST(request: NextRequest) {
-  // Auth check
-  const authHeader = request.headers.get("authorization");
-  const apiKey = process.env.INGEST_API_KEY?.trim();
-  const cronSecret = request.headers.get("x-vercel-cron-secret");
-  const vercelCronSecret = process.env.CRON_SECRET?.trim();
+  const rateLimitError = await rateLimit(request, "heavy");
+  if (rateLimitError) return rateLimitError;
 
-  const isAuthed =
-    !apiKey ||
-    authHeader === `Bearer ${apiKey}` ||
-    (vercelCronSecret && cronSecret === vercelCronSecret);
-
-  if (!isAuthed) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  // Auth: require Bearer token or Vercel CRON_SECRET
+  const authError = requireApiAuth(request);
+  if (authError) return authError;
 
   if (!process.env.RESEND_API_KEY) {
     return NextResponse.json({ error: "RESEND_API_KEY not configured" }, { status: 500 });
@@ -169,27 +179,59 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, message: "No active subscribers" });
   }
 
+  // Load alert rules to personalize digests
+  const { data: alertRules } = await supabase
+    .from("alert_rules")
+    .select("email, severity, categories")
+    .eq("active", true);
+
+  const rulesByEmail = new Map<string, { severity: string[]; categories: string[] }>();
+  if (alertRules) {
+    for (const rule of alertRules) {
+      const r = rule as { email: string; severity: string[]; categories: string[] };
+      rulesByEmail.set(r.email, { severity: r.severity || [], categories: r.categories || [] });
+    }
+  }
+
   const date = new Date().toLocaleDateString("en-US", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
   });
 
-  const html = buildEmailHtml(articles as DigestArticle[], date);
+  const allArticles = articles as DigestArticle[];
+  const results = { sent: 0, failed: 0, personalized: 0, errors: [] as string[] };
 
-  // Send to all subscribers in batches
+  // Send personalized digests per subscriber
   const emails = subscribers.map((s) => (s as { email: string }).email);
-  const results = { sent: 0, failed: 0, errors: [] as string[] };
-
-  // Resend supports batch sending up to 100 at a time
   const batchSize = 50;
   for (let i = 0; i < emails.length; i += batchSize) {
     const batch = emails.slice(i, i + batchSize);
 
     for (const email of batch) {
+      // Filter articles based on subscriber's preferences
+      const rule = rulesByEmail.get(email);
+      let personalizedArticles = allArticles;
+
+      if (rule) {
+        personalizedArticles = allArticles.filter((a) => {
+          // Filter by severity if set
+          if (rule.severity.length > 0 && !rule.severity.includes(a.threat_level)) return false;
+          // Filter by category if set
+          if (rule.categories.length > 0 && !rule.categories.includes(a.category)) return false;
+          return true;
+        });
+        if (personalizedArticles.length > 0) results.personalized++;
+      }
+
+      // Skip if no matching articles for this subscriber
+      if (personalizedArticles.length === 0) continue;
+
+      const html = buildEmailHtml(personalizedArticles, date);
+
       try {
         await getResend().emails.send({
-          from: process.env.RESEND_FROM_EMAIL || "CyberIntel <digest@cyberintel.dev>",
+          from: process.env.RESEND_FROM_EMAIL || "Security Standard <digest@securitystandard.dev>",
           to: email,
-          subject: `CyberIntel Daily Briefing — ${articles.length} threats | ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
+          subject: `Security Standard Daily Briefing — ${personalizedArticles.length} threats | ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
           html,
         });
         results.sent++;
@@ -199,6 +241,8 @@ export async function POST(request: NextRequest) {
       }
     }
   }
+
+  logAudit(request, "digest.send", { articles: articles.length, subscribers: emails.length, sent: results.sent });
 
   return NextResponse.json({
     success: true,

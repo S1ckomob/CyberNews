@@ -5,7 +5,7 @@ import { Code, Globe, Key, Zap, FileText, Search, Users, Lock } from "lucide-rea
 
 export const metadata = {
   title: "API Documentation",
-  description: "CyberIntel REST API for programmatic access to threat intelligence data.",
+  description: "Security Standard REST API for programmatic access to threat intelligence data.",
 };
 
 const endpoints = [
@@ -106,7 +106,7 @@ export default function APIDocsPage() {
         <h1 className="text-2xl font-bold tracking-tight">API Documentation</h1>
       </div>
       <p className="text-sm text-muted-foreground mb-6">
-        Programmatic access to CyberIntel threat intelligence. Integrate with your SIEM, SOAR, Slack, or custom tools.
+        Programmatic access to Security Standard threat intelligence. Integrate with your SIEM, SOAR, Slack, or custom tools.
       </p>
 
       {/* Quick Start */}
@@ -219,7 +219,7 @@ export default function APIDocsPage() {
             <p className="text-xs text-muted-foreground leading-relaxed">
               <strong>Slack:</strong> Set <code className="bg-muted px-1 rounded text-[10px]">SLACK_WEBHOOK_URL</code> for automatic critical threat alerts.<br />
               <strong>Email:</strong> Set <code className="bg-muted px-1 rounded text-[10px]">RESEND_API_KEY</code> for daily digest emails.<br />
-              <strong>Cron:</strong> External cron hits <code className="bg-muted px-1 rounded text-[10px]">/api/ingest</code> every 5 min.
+              <strong>Cron:</strong> External cron hits <code className="bg-muted px-1 rounded text-[10px]">GET /api/ingest-cron</code> with <code className="bg-muted px-1 rounded text-[10px]">Authorization: Bearer KEY</code> every 5 min.
             </p>
           </CardContent>
         </Card>

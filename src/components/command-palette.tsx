@@ -38,18 +38,24 @@ interface SearchResults {
 const PAGES = [
   { name: "Intelligence Feed", href: "/intelligence", icon: LayoutDashboard },
   { name: "Daily Briefing", href: "/briefing", icon: Sparkles },
+  { name: "Alerts", href: "/alerts", icon: AlertTriangle },
   { name: "Zero-Day Tracker", href: "/zero-days", icon: Bug },
   { name: "Ransomware Tracker", href: "/ransomware", icon: Lock },
   { name: "Firewalls & Network Edge", href: "/firewalls", icon: Shield },
   { name: "Windows Security", href: "/windows", icon: Monitor },
   { name: "CVE Search", href: "/cve", icon: Search },
   { name: "Threat Actors", href: "/threat-actors", icon: Users },
+  { name: "Threat Map", href: "/map", icon: Globe },
+  { name: "Attack Surface", href: "/attack-surface", icon: Shield },
+  { name: "Executive Summary", href: "/executive", icon: FileText },
   { name: "Timeline", href: "/timeline", icon: Clock },
-  { name: "Trends & Analytics", href: "/trends", icon: Clock },
+  { name: "Trends & Analytics", href: "/trends", icon: Eye },
   { name: "My Watchlist", href: "/watchlist", icon: Eye },
   { name: "Saved Articles", href: "/saved", icon: FileText },
+  { name: "API Documentation", href: "/api-docs", icon: FileText },
   { name: "Help & Navigation", href: "/help", icon: AlertTriangle },
-  { name: "Admin Panel", href: "/admin", icon: FileText },
+  { name: "About", href: "/about", icon: Globe },
+  { name: "Admin Panel", href: "/admin", icon: Lock },
 ];
 
 const THREAT_DOTS: Record<string, string> = {

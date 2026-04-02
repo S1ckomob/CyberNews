@@ -33,11 +33,11 @@ export default async function HomePage() {
       a.exploitedAt
   );
 
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app";
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "CyberIntel",
+    name: "Security Standard",
     url: siteUrl,
     description: "The institutional standard for cybersecurity intelligence.",
     potentialAction: {
@@ -49,7 +49,7 @@ export default async function HomePage() {
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "CyberIntel",
+    name: "Security Standard",
     url: siteUrl,
     description: "Institutional cybersecurity threat intelligence platform.",
     sameAs: [],

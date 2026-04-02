@@ -35,6 +35,8 @@ export function ActivityFeed() {
   const [newIds, setNewIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    if (!supabase) return;
+
     async function load() {
       const { data } = await supabase
         .from("articles")
@@ -49,17 +51,22 @@ export function ActivityFeed() {
     }
     load();
 
-    const channel = supabase
-      .channel("activity-feed")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "articles" }, (payload) => {
-        const row = payload.new as FeedItem;
-        setItems((prev) => [{ ...row, timestamp: new Date(row.published_at) }, ...prev].slice(0, 25));
-        setNewIds((prev) => new Set(prev).add(row.id));
-        setTimeout(() => setNewIds((prev) => { const next = new Set(prev); next.delete(row.id); return next; }), 3000);
-      })
-      .subscribe();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    try {
+      channel = supabase
+        .channel("activity-feed")
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "articles" }, (payload) => {
+          const row = payload.new as FeedItem;
+          setItems((prev) => [{ ...row, timestamp: new Date(row.published_at) }, ...prev].slice(0, 25));
+          setNewIds((prev) => new Set(prev).add(row.id));
+          setTimeout(() => setNewIds((prev) => { const next = new Set(prev); next.delete(row.id); return next; }), 3000);
+        })
+        .subscribe();
+    } catch {
+      // WebSocket may not be available in all environments
+    }
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { if (channel) supabase.removeChannel(channel); };
   }, []);
 
   if (items.length === 0) return null;

@@ -19,56 +19,61 @@ export function NotificationManager() {
   }, []);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || !supabase) return;
 
-    const channel = supabase
-      .channel("notification-alerts")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "articles" },
-        (payload) => {
-          const article = payload.new as {
-            id: string;
-            title: string;
-            slug: string;
-            threat_level: string;
-            category: string;
-          };
-
-          // Only notify on critical, high, or zero-day
-          const isUrgent =
-            article.threat_level === "critical" ||
-            article.threat_level === "high" ||
-            article.category === "zero-day";
-
-          if (!isUrgent) return;
-          if (seenIds.current.has(article.id)) return;
-          seenIds.current.add(article.id);
-
-          const levelEmoji =
-            article.threat_level === "critical" ? "🔴" :
-            article.threat_level === "high" ? "🟠" : "🟡";
-
-          if (Notification.permission === "granted") {
-            const n = new Notification(
-              `${levelEmoji} ${article.threat_level.toUpperCase()}: New Threat`,
-              {
-                body: article.title,
-                icon: "/favicon.ico",
-                tag: article.id,
-              }
-            );
-            n.onclick = () => {
-              window.focus();
-              window.location.href = `/article/${article.slug}`;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    try {
+      channel = supabase
+        .channel("notification-alerts")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "articles" },
+          (payload) => {
+            const article = payload.new as {
+              id: string;
+              title: string;
+              slug: string;
+              threat_level: string;
+              category: string;
             };
+
+            // Only notify on critical, high, or zero-day
+            const isUrgent =
+              article.threat_level === "critical" ||
+              article.threat_level === "high" ||
+              article.category === "zero-day";
+
+            if (!isUrgent) return;
+            if (seenIds.current.has(article.id)) return;
+            seenIds.current.add(article.id);
+
+            const levelEmoji =
+              article.threat_level === "critical" ? "🔴" :
+              article.threat_level === "high" ? "🟠" : "🟡";
+
+            if (Notification.permission === "granted") {
+              const n = new Notification(
+                `${levelEmoji} ${article.threat_level.toUpperCase()}: New Threat`,
+                {
+                  body: article.title,
+                  icon: "/favicon.ico",
+                  tag: article.id,
+                }
+              );
+              n.onclick = () => {
+                window.focus();
+                window.location.href = `/article/${article.slug}`;
+              };
+            }
           }
-        }
-      )
-      .subscribe();
+        )
+        .subscribe();
+    } catch {
+      // WebSocket may not be available in all environments
+    }
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) supabase.removeChannel(channel);
     };
   }, [enabled]);
 

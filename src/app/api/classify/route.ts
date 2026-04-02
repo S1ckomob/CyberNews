@@ -3,6 +3,9 @@ import { generateText, Output } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
 import { z } from "zod";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
+import { requireApiAuth } from "@/lib/api-auth";
+import { logAudit } from "@/lib/audit";
+import { rateLimit } from "@/lib/rate-limit";
 
 const classificationSchema = z.object({
   title: z.string().describe("Concise, factual title for the threat report"),
@@ -59,20 +62,34 @@ function slugify(text: string): string {
 }
 
 export async function POST(request: NextRequest) {
-  const authHeader = request.headers.get("authorization");
-  const apiKey = process.env.INGEST_API_KEY;
-  if (apiKey && authHeader !== `Bearer ${apiKey}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const rateLimitError = await rateLimit(request, "sensitive");
+  if (rateLimitError) return rateLimitError;
+
+  // Auth: require Bearer token or Vercel CRON_SECRET
+  const authError = requireApiAuth(request);
+  if (authError) return authError;
+
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const body = await request.json();
-  const { raw_text, source, source_url } = body;
+  const { raw_text, source, source_url } = body as {
+    raw_text?: string;
+    source?: string;
+    source_url?: string;
+  };
 
-  if (!raw_text) {
-    return NextResponse.json(
-      { error: "raw_text is required" },
-      { status: 400 }
-    );
+  if (!raw_text || typeof raw_text !== "string") {
+    return NextResponse.json({ error: "raw_text is required" }, { status: 400 });
+  }
+  if (raw_text.length > 50000) {
+    return NextResponse.json({ error: "raw_text exceeds 50,000 character limit" }, { status: 400 });
+  }
+  if (source_url && (typeof source_url !== "string" || source_url.length > 2048)) {
+    return NextResponse.json({ error: "Invalid source_url" }, { status: 400 });
   }
 
   const { output: classification } = await generateText({
@@ -148,6 +165,8 @@ ${raw_text}`,
       { status: 500 }
     );
   }
+
+  logAudit(request, "classify.run", { slug: data?.slug, threat_level: classification.threat_level });
 
   return NextResponse.json({
     success: true,

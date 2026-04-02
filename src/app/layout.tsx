@@ -18,13 +18,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "CyberIntel | Institutional Cybersecurity Intelligence",
-    template: "%s | CyberIntel",
+    default: "Security Standard | Institutional Cybersecurity Intelligence",
+    template: "%s | Security Standard",
   },
   description:
     "The institutional standard for cybersecurity intelligence. Real-time threat data, verified sources, and actionable intelligence for security teams.",
@@ -34,21 +34,21 @@ export const metadata: Metadata = {
     "incident response", "MITRE ATT&CK", "CVSS", "NVD", "CISA",
     "SOC", "security operations", "cyber threat", "exploit",
   ],
-  authors: [{ name: "CyberIntel", url: siteUrl }],
-  creator: "CyberIntel",
-  publisher: "CyberIntel",
+  authors: [{ name: "Security Standard", url: siteUrl }],
+  creator: "Security Standard",
+  publisher: "Security Standard",
   formatDetection: { telephone: false, email: false },
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "CyberIntel",
-    title: "CyberIntel | Institutional Cybersecurity Intelligence",
+    siteName: "Security Standard",
+    title: "Security Standard | Institutional Cybersecurity Intelligence",
     description: "Real-time threat data. Verified sources. Actionable intelligence.",
     url: siteUrl,
   },
   twitter: {
     card: "summary_large_image",
-    title: "CyberIntel",
+    title: "Security Standard",
     description: "The institutional standard for cybersecurity intelligence.",
   },
   alternates: {
@@ -88,8 +88,8 @@ export default function RootLayout({
           <CommandPalette />
           <Navbar />
           <ThreatTicker />
-          <main className="flex-1">{children}</main>
-          <footer className="border-t border-border bg-card/50">
+          <main className="flex-1" role="main">{children}</main>
+          <footer className="border-t border-border bg-card/50" role="contentinfo">
             <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
               <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
                 <div>
@@ -97,7 +97,7 @@ export default function RootLayout({
                     <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-primary" stroke="currentColor" strokeWidth="2">
                       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                     </svg>
-                    CyberIntel
+                    Security Standard
                   </div>
                   <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
                     The institutional standard for cybersecurity
@@ -131,13 +131,13 @@ export default function RootLayout({
                   </h4>
                   <ul className="mt-3 space-y-2 text-sm">
                     <li><a href="/about" className="text-muted-foreground hover:text-foreground transition-colors">About</a></li>
-                    <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">API Documentation</a></li>
-                    <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Contact</a></li>
+                    <li><a href="/api-docs" className="text-muted-foreground hover:text-foreground transition-colors">API Documentation</a></li>
+                    <li><a href="/help" className="text-muted-foreground hover:text-foreground transition-colors">Help & Contact</a></li>
                   </ul>
                 </div>
               </div>
               <div className="mt-8 border-t border-border pt-6 text-center text-xs text-muted-foreground">
-                &copy; {new Date().getFullYear()} CyberIntel. All rights reserved. Intelligence data sourced from verified public sources.
+                &copy; {new Date().getFullYear()} Security Standard. All rights reserved. Intelligence data sourced from verified public sources.
               </div>
             </div>
           </footer>

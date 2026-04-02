@@ -18,6 +18,7 @@ interface AlertRule {
   products: string[];
   actors: string[];
   severity: string[];
+  categories: string[];
   active: boolean;
 }
 
@@ -32,7 +33,12 @@ function articleMatchesRule(article: AlertArticle, rule: AlertRule): boolean {
   // Check severity
   if (!rule.severity.includes(article.threat_level)) return false;
 
-  // If no products or actors specified, match on severity alone
+  // Check categories if specified
+  if (rule.categories && rule.categories.length > 0) {
+    if (!rule.categories.includes(article.category)) return false;
+  }
+
+  // If no products or actors specified, match on severity (and category if set)
   if (rule.products.length === 0 && rule.actors.length === 0) return true;
 
   const text = `${article.title} ${article.affected_products.join(" ")} ${article.summary}`.toLowerCase();
@@ -49,7 +55,7 @@ function articleMatchesRule(article: AlertArticle, rule: AlertRule): boolean {
 }
 
 function buildAlertEmail(articles: AlertArticle[], rule: AlertRule): string {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.app";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app";
   const matchDesc = [
     ...rule.products.map((p) => p),
     ...rule.actors.map((a) => a),
@@ -80,7 +86,7 @@ function buildAlertEmail(articles: AlertArticle[], rule: AlertRule): string {
 <tr><td align="center" style="padding:20px">
 <table width="560" cellpadding="0" cellspacing="0" style="background:#0f172a;border-radius:8px;border:1px solid #1e293b">
 <tr><td style="padding:20px 24px 12px">
-  <span style="font-size:14px;font-weight:700;color:#e2e8f0">🚨 CyberIntel Alert</span>
+  <span style="font-size:14px;font-weight:700;color:#e2e8f0">🚨 Security Standard Alert</span>
   <br/>
   <span style="font-size:12px;color:#94a3b8">${articles.length} new threat${articles.length !== 1 ? "s" : ""} matching: ${matchDesc}</span>
 </td></tr>
@@ -117,7 +123,7 @@ export async function sendPersonalizedAlerts(newArticles: AlertArticle[]) {
 
     try {
       await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || "CyberIntel <alerts@cyberintel.dev>",
+        from: process.env.RESEND_FROM_EMAIL || "Security Standard <alerts@securitystandard.dev>",
         to: rule.email,
         subject: `🚨 ${matches.length} new threat${matches.length !== 1 ? "s" : ""} matching your alerts — ${matches[0].title.slice(0, 60)}`,
         html: buildAlertEmail(matches, rule),

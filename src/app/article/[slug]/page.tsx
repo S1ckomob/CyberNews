@@ -64,7 +64,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const article = await fetchArticleBySlug(slug);
   if (!article) return { title: "Not Found" };
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app";
   return {
     title: article.title,
     description: article.summary,
@@ -74,7 +74,7 @@ export async function generateMetadata({
       description: article.summary,
       type: "article",
       url: `${siteUrl}/article/${slug}`,
-      siteName: "CyberIntel",
+      siteName: "Security Standard",
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt,
       tags: article.tags,
@@ -135,7 +135,7 @@ export default async function ArticlePage({
     article.patchedAt && { label: "Patch Available", date: article.patchedAt },
   ].filter(Boolean) as { label: string; date: string }[];
 
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app";
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -144,7 +144,7 @@ export default async function ArticlePage({
     datePublished: article.publishedAt,
     dateModified: article.updatedAt,
     author: { "@type": "Organization", name: article.source, url: article.sourceUrl },
-    publisher: { "@type": "Organization", name: "CyberIntel", url: siteUrl },
+    publisher: { "@type": "Organization", name: "Security Standard", url: siteUrl },
     url: `${siteUrl}/article/${article.slug}`,
     keywords: article.tags.join(", "),
     articleSection: article.category,

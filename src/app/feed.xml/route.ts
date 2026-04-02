@@ -1,6 +1,6 @@
 import { getSupabase } from "@/lib/supabase";
 
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://cybernews.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://cyber-news-five.vercel.app";
 
 export async function GET() {
   const { data } = await getSupabase()
@@ -31,7 +31,7 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>CyberIntel — Cybersecurity Threat Intelligence</title>
+    <title>Security Standard — Cybersecurity Threat Intelligence</title>
     <link>${SITE_URL}</link>
     <description>Real-time cybersecurity threat intelligence. Verified sources. Actionable data.</description>
     <language>en-us</language>
