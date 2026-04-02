@@ -86,11 +86,6 @@ export default async function TrendsPage() {
   last7d.forEach((a) => a.industries.forEach((i) => { industryCounts[i] = (industryCounts[i] || 0) + 1; }));
   const topIndustries = Object.entries(industryCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
-  // Top sources
-  const sourceCounts: Record<string, number> = {};
-  last7d.forEach((a) => { sourceCounts[a.source] = (sourceCounts[a.source] || 0) + 1; });
-  const topSources = Object.entries(sourceCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
-
   // Week-over-week total change
   const totalChange = prev7d.length > 0
     ? Math.round(((last7d.length - prev7d.length) / prev7d.length) * 100)
@@ -267,20 +262,6 @@ export default async function TrendsPage() {
                     {ind}
                     <span className="font-mono text-primary">{count}</span>
                   </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-5">
-              <h2 className="text-sm font-semibold uppercase tracking-wider mb-4">Top Sources (7d)</h2>
-              <div className="space-y-1.5">
-                {topSources.map(([source, count]) => (
-                  <div key={source} className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">{source}</span>
-                    <span className="font-mono font-bold">{count}</span>
-                  </div>
                 ))}
               </div>
             </CardContent>
