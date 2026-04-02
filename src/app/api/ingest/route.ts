@@ -187,6 +187,17 @@ async function fetchRSSFeed(config: RSSFeedConfig): Promise<IngestArticle[]> {
 
       if (!title) return null;
 
+      // Skip non-threat content (events, opinions, podcasts, webinars, career)
+      const titleLower = title.toLowerCase();
+      const skipPatterns = [
+        "black hat", "def con", "rsa conference", "webinar", "podcast",
+        "career", "hiring", "job opening", "opinion:", "editorial:",
+        "book review", "sponsored", "advertisement", "register now",
+        "call for papers", "cfp", "save the date", "conference recap",
+        "award", "winner", "top 10 list", "infographic",
+      ];
+      if (skipPatterns.some((p) => titleLower.includes(p))) return null;
+
       const publishedDate = pubDate ? new Date(pubDate) : new Date();
       if (publishedDate < cutoff) return null;
 
