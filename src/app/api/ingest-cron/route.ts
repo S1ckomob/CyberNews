@@ -4,7 +4,7 @@ import { rateLimit } from "@/lib/rate-limit";
 /**
  * Lightweight cron endpoint for external services (cron-job.org).
  * Triggers feed ingestion only (not digest — that stays daily).
- * Authenticates via Authorization: Bearer header only — never pass keys in URLs.
+ * Authenticates via Authorization: Bearer header only.
  */
 export async function GET(request: NextRequest) {
   const rateLimitError = await rateLimit(request, "heavy");
@@ -22,17 +22,22 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Use fixed base URL to prevent SSRF
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : request.nextUrl.origin);
+  // Call ingest directly via internal POST to avoid proxy/redirect issues
+  // Build an internal request with the correct auth
+  const ingestUrl = new URL("/api/ingest", request.url);
+  const ingestRequest = new NextRequest(ingestUrl, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${process.env.INGEST_API_KEY || ""}`,
+      "x-admin-key": process.env.INGEST_API_KEY || "",
+    },
+  });
 
   try {
-    const res = await fetch(`${baseUrl}/api/ingest`, {
-      method: "POST",
-      headers: { authorization: `Bearer ${process.env.INGEST_API_KEY || ""}` },
-    });
-    const data = await res.json();
+    // Dynamically import and call the ingest handler directly
+    const { POST } = await import("@/app/api/ingest/route");
+    const ingestResponse = await POST(ingestRequest);
+    const data = await ingestResponse.json();
 
     return NextResponse.json({
       success: true,

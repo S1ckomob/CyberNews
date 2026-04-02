@@ -37,7 +37,7 @@ interface FeedResult {
 
 // ---------- Helpers ----------
 
-const xmlParser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
+const xmlParser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_", htmlEntities: true, processEntities: false });
 
 function slugify(text: string): string {
   return text
@@ -124,40 +124,35 @@ interface RSSFeedConfig {
   maxItems: number;
 }
 
-const NITTER_BASE = "https://nitter.net";
-
 const RSS_FEEDS: RSSFeedConfig[] = [
-  // News sites
-  { url: "https://www.bleepingcomputer.com/feed/", source: "BleepingComputer", maxItems: 15 },
-  { url: "https://feeds.feedburner.com/TheHackersNews", source: "The Hacker News", maxItems: 15 },
-  { url: "https://krebsonsecurity.com/feed/", source: "Krebs on Security", maxItems: 10 },
-  { url: "https://www.darkreading.com/rss.xml", source: "Dark Reading", maxItems: 15 },
-  { url: "https://www.securityweek.com/feed/", source: "SecurityWeek", maxItems: 15 },
-  { url: "https://cyberscoop.com/feed/", source: "CyberScoop", maxItems: 10 },
-  { url: "https://therecord.media/feed", source: "The Record", maxItems: 15 },
-  { url: "https://threatpost.com/feed/", source: "Threatpost", maxItems: 10 },
+  // Tier 1 — Major cybersecurity news (high volume)
+  { url: "https://www.bleepingcomputer.com/feed/", source: "BleepingComputer", maxItems: 30 },
+  { url: "https://feeds.feedburner.com/TheHackersNews", source: "The Hacker News", maxItems: 30 },
+  { url: "https://www.darkreading.com/rss.xml", source: "Dark Reading", maxItems: 30 },
+  { url: "https://www.securityweek.com/feed/", source: "SecurityWeek", maxItems: 30 },
+  { url: "https://therecord.media/feed", source: "The Record", maxItems: 30 },
 
-  // Twitter/X via Nitter — government & official
-  { url: `${NITTER_BASE}/CISAgov/rss`, source: "CISA (X)", maxItems: 10 },
-  { url: `${NITTER_BASE}/NSACyber/rss`, source: "NSA Cyber (X)", maxItems: 8 },
-  { url: `${NITTER_BASE}/FBI/rss`, source: "FBI (X)", maxItems: 5 },
-  { url: `${NITTER_BASE}/ABORODULIN/rss`, source: "NCSC UK (X)", maxItems: 5 },
+  // Tier 2 — Specialized / investigative
+  { url: "https://krebsonsecurity.com/feed/", source: "Krebs on Security", maxItems: 20 },
+  { url: "https://cyberscoop.com/feed/", source: "CyberScoop", maxItems: 20 },
+  { url: "https://threatpost.com/feed/", source: "Threatpost", maxItems: 20 },
+  { url: "https://www.infosecurity-magazine.com/rss/news/", source: "Infosecurity Magazine", maxItems: 25 },
+  { url: "https://www.csoonline.com/feed/", source: "CSO Online", maxItems: 20 },
 
-  // Twitter/X via Nitter — vendors & threat intel
-  { url: `${NITTER_BASE}/MsftSecIntel/rss`, source: "Microsoft Threat Intel (X)", maxItems: 8 },
-  { url: `${NITTER_BASE}/GoogleTAG/rss`, source: "Google TAG (X)", maxItems: 5 },
-  { url: `${NITTER_BASE}/Mandiant/rss`, source: "Mandiant (X)", maxItems: 5 },
-  { url: `${NITTER_BASE}/CrowdStrike/rss`, source: "CrowdStrike (X)", maxItems: 5 },
-  { url: `${NITTER_BASE}/SentinelOne/rss`, source: "SentinelOne (X)", maxItems: 5 },
+  // Tier 3 — Vendor advisories & research
+  { url: "https://www.cisa.gov/cybersecurity-advisories/all.xml", source: "CISA Advisories", maxItems: 30 },
+  { url: "https://cloud.google.com/feeds/google-cloud-security-bulletins.xml", source: "Google Cloud Security", maxItems: 15 },
+  { url: "https://www.us-cert.gov/ncas/alerts.xml", source: "US-CERT Alerts", maxItems: 20 },
 
-  // Twitter/X via Nitter — security researchers
-  { url: `${NITTER_BASE}/GossiTheDog/rss`, source: "Kevin Beaumont (X)", maxItems: 8 },
-  { url: `${NITTER_BASE}/malaborodulin/rss`, source: "MalwareTech (X)", maxItems: 5 },
-  { url: `${NITTER_BASE}/TheDFIRReport/rss`, source: "DFIR Report (X)", maxItems: 5 },
-  { url: `${NITTER_BASE}/vaborodulin/rss`, source: "vx-underground (X)", maxItems: 5 },
-  { url: `${NITTER_BASE}/BillDemirkapi/rss`, source: "Bill Demirkapi (X)", maxItems: 5 },
-  { url: `${NITTER_BASE}/campuscodi/rss`, source: "Catalin Cimpanu (X)", maxItems: 8 },
-  { url: `${NITTER_BASE}/H4ckManac/rss`, source: "HackManac (X)", maxItems: 8 },
+  // Tier 4 — Research blogs
+  { url: "https://blog.talosintelligence.com/rss/", source: "Cisco Talos", maxItems: 15 },
+  { url: "https://www.welivesecurity.com/feed/", source: "WeLiveSecurity (ESET)", maxItems: 15 },
+  { url: "https://securelist.com/feed/", source: "Securelist (Kaspersky)", maxItems: 15 },
+  { url: "https://unit42.paloaltonetworks.com/feed/", source: "Unit 42 (Palo Alto)", maxItems: 15 },
+  { url: "https://www.sentinelone.com/labs/feed/", source: "SentinelLabs", maxItems: 10 },
+  { url: "https://www.mandiant.com/resources/blog/rss.xml", source: "Mandiant", maxItems: 15 },
+  { url: "https://blog.qualys.com/feed", source: "Qualys Blog", maxItems: 10 },
+  { url: "https://www.rapid7.com/blog/rss/", source: "Rapid7", maxItems: 10 },
 ];
 
 async function fetchRSSFeed(config: RSSFeedConfig): Promise<IngestArticle[]> {
@@ -183,7 +178,7 @@ async function fetchRSSFeed(config: RSSFeedConfig): Promise<IngestArticle[]> {
   }
 
   const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - 3); // Last 3 days only
+  cutoff.setDate(cutoff.getDate() - 7); // Last 7 days
 
   return items
     .slice(0, config.maxItems)
@@ -308,7 +303,7 @@ async function fetchCISAKEV(): Promise<IngestArticle[]> {
   const vulnerabilities: CISAVulnerability[] = data.vulnerabilities || [];
 
   const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - 7);
+  cutoff.setDate(cutoff.getDate() - 14);
 
   return vulnerabilities
     .filter((v) => new Date(v.dateAdded) >= cutoff)
@@ -336,14 +331,26 @@ async function fetchCISAKEV(): Promise<IngestArticle[]> {
 
 // ---------- NVD Critical CVEs ----------
 
-async function fetchNVDRecent(): Promise<IngestArticle[]> {
+interface NVDVuln {
+  cve: {
+    id: string;
+    descriptions: { lang: string; value: string }[];
+    published: string;
+    lastModified: string;
+    metrics?: {
+      cvssMetricV31?: { cvssData: { baseScore: number; baseSeverity: string } }[];
+    };
+  };
+}
+
+async function fetchNVDBySeverity(severity: "CRITICAL" | "HIGH"): Promise<IngestArticle[]> {
   const now = new Date();
-  const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const params = new URLSearchParams({
-    pubStartDate: threeDaysAgo.toISOString().replace("Z", ""),
+    pubStartDate: sevenDaysAgo.toISOString().replace("Z", ""),
     pubEndDate: now.toISOString().replace("Z", ""),
-    cvssV3Severity: "CRITICAL",
-    resultsPerPage: "20",
+    cvssV3Severity: severity,
+    resultsPerPage: "50",
   });
 
   const res = await fetch(
@@ -353,19 +360,8 @@ async function fetchNVDRecent(): Promise<IngestArticle[]> {
   if (!res.ok) return [];
 
   const data = await res.json();
-  interface NVDVuln {
-    cve: {
-      id: string;
-      descriptions: { lang: string; value: string }[];
-      published: string;
-      lastModified: string;
-      metrics?: {
-        cvssMetricV31?: { cvssData: { baseScore: number; baseSeverity: string } }[];
-      };
-    };
-  }
-
   const items: NVDVuln[] = data.vulnerabilities || [];
+  const threatLevel = severity === "CRITICAL" ? "critical" as const : "high" as const;
 
   return items.map((item) => {
     const desc =
@@ -373,11 +369,11 @@ async function fetchNVDRecent(): Promise<IngestArticle[]> {
     const score = item.cve.metrics?.cvssMetricV31?.[0]?.cvssData.baseScore;
 
     return {
-      title: `NVD Critical: ${item.cve.id} — ${desc.slice(0, 80)}${desc.length > 80 ? "..." : ""}`,
+      title: `NVD ${severity}: ${item.cve.id} — ${desc.slice(0, 80)}${desc.length > 80 ? "..." : ""}`,
       slug: slugify(`nvd-${item.cve.id}`),
       summary: desc.slice(0, 400),
       content: `${desc}\n\nCVSS Score: ${score ?? "Pending"}. Published: ${item.cve.published}.`,
-      threat_level: "critical" as const,
+      threat_level: threatLevel,
       category: "vulnerability",
       cves: [item.cve.id],
       affected_products: [] as string[],
@@ -389,10 +385,19 @@ async function fetchNVDRecent(): Promise<IngestArticle[]> {
       published_at: item.cve.published,
       verified: true,
       verified_by: ["NIST"],
-      tags: ["nvd", "cve", "critical"],
+      tags: ["nvd", "cve", severity.toLowerCase()],
       region: "Global",
     };
   });
+}
+
+async function fetchNVDRecent(): Promise<IngestArticle[]> {
+  // Fetch both CRITICAL and HIGH CVEs in parallel
+  const [critical, high] = await Promise.all([
+    fetchNVDBySeverity("CRITICAL").catch(() => []),
+    fetchNVDBySeverity("HIGH").catch(() => []),
+  ]);
+  return [...critical, ...high];
 }
 
 // ---------- Main Handler ----------

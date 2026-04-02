@@ -24,10 +24,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { email, categories, severity } = body as {
+  const { email, categories, severity, products } = body as {
     email?: string;
     categories?: string[];
     severity?: string[];
+    products?: string[];
   };
 
   if (!email || !isValidEmail(email)) {
@@ -42,6 +43,9 @@ export async function POST(request: NextRequest) {
   const validSeverities = ["critical", "high", "medium", "low"];
   if (severity && (!Array.isArray(severity) || severity.some((s) => !validSeverities.includes(s)))) {
     return NextResponse.json({ error: "Invalid severity levels" }, { status: 400 });
+  }
+  if (products && (!Array.isArray(products) || products.length > 50)) {
+    return NextResponse.json({ error: "products must be an array (max 50)" }, { status: 400 });
   }
 
   const normalizedEmail = email.toLowerCase().trim();
@@ -59,14 +63,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // If categories or severity provided, auto-create alert rules
-  if ((categories && categories.length > 0) || (severity && severity.length > 0)) {
+  // Auto-create alert rules if any preferences provided
+  if ((categories && categories.length > 0) || (severity && severity.length > 0) || (products && products.length > 0)) {
     await supabase
       .from("alert_rules")
       .upsert(
         {
           email: normalizedEmail,
-          products: [],
+          products: products || [],
           actors: [],
           severity: severity || ["critical", "high"],
           categories: categories || [],
@@ -76,7 +80,7 @@ export async function POST(request: NextRequest) {
       );
   }
 
-  logAudit(request, "subscriber.add", { email: normalizedEmail, categories, severity });
+  logAudit(request, "subscriber.add", { email: normalizedEmail, categories, severity, products });
 
   return NextResponse.json({ success: true, message: "Subscribed to daily briefing" });
 }
