@@ -10,6 +10,7 @@ import { SubscribeForm } from "@/components/subscribe-form";
 import { ThreatLevelIndicator } from "@/components/threat-level-indicator";
 import { FreshnessBadge } from "@/components/freshness-badge";
 import { SeverityChart } from "@/components/severity-chart";
+import { ThreatMap } from "@/components/threat-map";
 import { ActivityFeed } from "@/components/activity-feed";
 import { StatsBar } from "@/components/stats-bar";
 import { fetchArticlesLimited } from "@/lib/queries";
@@ -95,6 +96,18 @@ export default async function HomePage() {
                 <SeverityChart articles={articles} />
               </CardContent>
             </Card>
+
+            <Link href="/map">
+              <Card className="group hover:border-primary/30 transition-all cursor-pointer">
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Threat Map</span>
+                    <span className="text-[9px] text-muted-foreground group-hover:text-primary transition-colors">View →</span>
+                  </div>
+                  <ThreatMap articles={articles} compact />
+                </CardContent>
+              </Card>
+            </Link>
 
             <Card className="border-threat-critical/20">
               <CardContent className="p-4">

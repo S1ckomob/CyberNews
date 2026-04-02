@@ -28,6 +28,7 @@ import {
   Bookmark,
   TrendingUp,
   HelpCircle,
+  Globe,
 } from "lucide-react";
 
 const primaryNav = [
@@ -38,6 +39,7 @@ const primaryNav = [
 ];
 
 const moreNav = [
+  { name: "Threat Map", href: "/map", icon: Globe },
   { name: "Trends", href: "/trends", icon: TrendingUp },
   { name: "Timeline", href: "/timeline", icon: Clock },
   { name: "Ransomware", href: "/ransomware", icon: Lock },
@@ -65,6 +67,7 @@ const allNav = [
   { name: "Industries", href: "/industry", icon: Building2 },
   { name: "Watchlist", href: "/watchlist", icon: Eye },
   { name: "Saved", href: "/saved", icon: Bookmark },
+  { name: "Threat Map", href: "/map", icon: Globe },
   { name: "API Docs", href: "/api-docs", icon: Clock },
   { name: "Help", href: "/help", icon: HelpCircle },
   { name: "About", href: "/about", icon: Sparkles },
