@@ -321,7 +321,7 @@ export default async function ArticlePage({
                   {article.cves.map((cve) => (
                     <Link
                       key={cve}
-                      href={`/cve?q=${cve}`}
+                      href={`/cve/${cve}`}
                       className="flex items-center gap-2 rounded-md bg-muted px-2.5 py-1.5 font-mono text-xs hover:bg-accent transition-colors"
                     >
                       <AlertTriangle className="h-3 w-3 text-threat-high" />
