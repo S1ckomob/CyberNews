@@ -42,7 +42,7 @@ const PAGES = [
   { name: "Zero-Day Tracker", href: "/zero-days", icon: Bug },
   { name: "Ransomware Tracker", href: "/ransomware", icon: Lock },
   { name: "Firewalls & Network Edge", href: "/firewalls", icon: Shield },
-  { name: "Windows Security", href: "/windows", icon: Monitor },
+  { name: "Microsoft Security", href: "/windows", icon: Monitor },
   { name: "CVE Search", href: "/cve", icon: Search },
   { name: "Threat Actors", href: "/threat-actors", icon: Users },
   { name: "Threat Map", href: "/map", icon: Globe },
