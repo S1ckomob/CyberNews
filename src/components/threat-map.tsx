@@ -19,8 +19,11 @@ const THREAT_COLORS: Record<string, string> = {
 };
 
 function formatDate(dateString: string) {
-  const diffH = Math.floor((Date.now() - new Date(dateString).getTime()) / 3600000);
-  if (diffH < 1) return "Just now";
+  const diffMs = Date.now() - new Date(dateString).getTime();
+  const diffM = Math.floor(diffMs / 60000);
+  const diffH = Math.floor(diffMs / 3600000);
+  if (diffM < 1) return "Just now";
+  if (diffM < 60) return `${diffM}m ago`;
   if (diffH < 24) return `${diffH}h ago`;
   const diffD = Math.floor(diffH / 24);
   if (diffD < 7) return `${diffD}d ago`;
