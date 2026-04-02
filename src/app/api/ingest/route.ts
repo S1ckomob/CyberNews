@@ -120,7 +120,10 @@ interface RSSFeedConfig {
   maxItems: number;
 }
 
+const NITTER_BASE = "https://nitter.net";
+
 const RSS_FEEDS: RSSFeedConfig[] = [
+  // News sites
   { url: "https://www.bleepingcomputer.com/feed/", source: "BleepingComputer", maxItems: 15 },
   { url: "https://feeds.feedburner.com/TheHackersNews", source: "The Hacker News", maxItems: 15 },
   { url: "https://krebsonsecurity.com/feed/", source: "Krebs on Security", maxItems: 10 },
@@ -129,6 +132,28 @@ const RSS_FEEDS: RSSFeedConfig[] = [
   { url: "https://cyberscoop.com/feed/", source: "CyberScoop", maxItems: 10 },
   { url: "https://therecord.media/feed", source: "The Record", maxItems: 15 },
   { url: "https://threatpost.com/feed/", source: "Threatpost", maxItems: 10 },
+
+  // Twitter/X via Nitter — government & official
+  { url: `${NITTER_BASE}/CISAgov/rss`, source: "CISA (X)", maxItems: 10 },
+  { url: `${NITTER_BASE}/NSACyber/rss`, source: "NSA Cyber (X)", maxItems: 8 },
+  { url: `${NITTER_BASE}/FBI/rss`, source: "FBI (X)", maxItems: 5 },
+  { url: `${NITTER_BASE}/ABORODULIN/rss`, source: "NCSC UK (X)", maxItems: 5 },
+
+  // Twitter/X via Nitter — vendors & threat intel
+  { url: `${NITTER_BASE}/MsftSecIntel/rss`, source: "Microsoft Threat Intel (X)", maxItems: 8 },
+  { url: `${NITTER_BASE}/GoogleTAG/rss`, source: "Google TAG (X)", maxItems: 5 },
+  { url: `${NITTER_BASE}/Mandiant/rss`, source: "Mandiant (X)", maxItems: 5 },
+  { url: `${NITTER_BASE}/CrowdStrike/rss`, source: "CrowdStrike (X)", maxItems: 5 },
+  { url: `${NITTER_BASE}/SentinelOne/rss`, source: "SentinelOne (X)", maxItems: 5 },
+
+  // Twitter/X via Nitter — security researchers
+  { url: `${NITTER_BASE}/GossiTheDog/rss`, source: "Kevin Beaumont (X)", maxItems: 8 },
+  { url: `${NITTER_BASE}/malaborodulin/rss`, source: "MalwareTech (X)", maxItems: 5 },
+  { url: `${NITTER_BASE}/TheDFIRReport/rss`, source: "DFIR Report (X)", maxItems: 5 },
+  { url: `${NITTER_BASE}/vaborodulin/rss`, source: "vx-underground (X)", maxItems: 5 },
+  { url: `${NITTER_BASE}/BillDemirkapi/rss`, source: "Bill Demirkapi (X)", maxItems: 5 },
+  { url: `${NITTER_BASE}/campuscodi/rss`, source: "Catalin Cimpanu (X)", maxItems: 8 },
+  { url: `${NITTER_BASE}/H4ckManac/rss`, source: "HackManac (X)", maxItems: 8 },
 ];
 
 async function fetchRSSFeed(config: RSSFeedConfig): Promise<IngestArticle[]> {
@@ -187,8 +212,27 @@ async function fetchRSSFeed(config: RSSFeedConfig): Promise<IngestArticle[]> {
 
       if (!title) return null;
 
+      // For Twitter/Nitter feeds: title is often the full tweet, description has HTML
+      const isTwitter = config.source.includes("(X)");
+      let displayTitle = title;
+      if (isTwitter) {
+        // Skip retweets, replies, and non-security content
+        if (title.startsWith("RT @") || title.startsWith("@")) return null;
+        // Skip short tweets with no substance (< 50 chars)
+        if (title.length < 50 && !title.match(/CVE-|zero.?day|critical|exploit|breach|ransomware|malware|vuln/i)) return null;
+        // Use truncated tweet as title if it's too long
+        if (title.length > 120) {
+          const firstSentence = title.split(/[.!]\s/)[0];
+          if (firstSentence && firstSentence.length >= 30 && firstSentence.length <= 150) {
+            displayTitle = firstSentence;
+          } else {
+            displayTitle = title.slice(0, 117) + "...";
+          }
+        }
+      }
+
       // Skip non-threat content (events, opinions, podcasts, webinars, career)
-      const titleLower = title.toLowerCase();
+      const titleLower = displayTitle.toLowerCase();
       const skipPatterns = [
         "black hat", "def con", "rsa conference", "webinar", "podcast",
         "career", "hiring", "job opening", "opinion:", "editorial:",
@@ -206,10 +250,10 @@ async function fetchRSSFeed(config: RSSFeedConfig): Promise<IngestArticle[]> {
       const actors = extractActors(fullText);
 
       return {
-        title,
-        slug: slugify(title),
-        summary: description.slice(0, 400),
-        content: description,
+        title: displayTitle,
+        slug: slugify(displayTitle),
+        summary: (isTwitter ? title : description).slice(0, 400),
+        content: isTwitter ? title : description,
         threat_level: guessThreatLevel(fullText),
         category: guessCategory(fullText),
         cves,
