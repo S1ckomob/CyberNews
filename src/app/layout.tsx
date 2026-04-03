@@ -6,6 +6,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { CommandPaletteProvider } from "@/lib/command-palette-context";
 import { CommandPalette } from "@/components/command-palette";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -150,6 +152,8 @@ export default function RootLayout({
         </TooltipProvider>
         </CommandPaletteProvider>
         </ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
