@@ -80,46 +80,55 @@ function buildEmailHtml(articles: DigestArticle[], date: string) {
       ${items.map(articleRow).join("")}`;
   }
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com";
+
   return `
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
 <body style="margin:0;padding:0;background:#0a0e1a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0e1a">
-<tr><td align="center" style="padding:20px">
-<table width="600" cellpadding="0" cellspacing="0" style="background:#0f172a;border-radius:8px;border:1px solid #1e293b">
+<tr><td align="center" style="padding:24px 16px">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#0f172a;border-radius:10px;border:1px solid #1e293b;overflow:hidden">
 
-<!-- Header -->
-<tr><td style="padding:24px 24px 16px">
+<!-- Brand Header -->
+<tr><td style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);padding:24px 28px 20px">
   <table width="100%"><tr>
-    <td><span style="font-size:16px;font-weight:700;color:#e2e8f0">🛡 Security Intel Hub Daily Briefing</span></td>
-    <td align="right"><span style="font-size:12px;color:#64748b">${date}</span></td>
+    <td>
+      <div style="font-size:18px;font-weight:700;color:#e2e8f0;letter-spacing:-0.02em">🛡 Security Intel Hub</div>
+      <div style="margin-top:4px;font-size:12px;color:#64748b">Daily Briefing · ${date}</div>
+    </td>
+    <td align="right">
+      <div style="display:inline-block;background:#3b82f620;border:1px solid #3b82f640;border-radius:6px;padding:6px 12px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#3b82f6;font-weight:700">DAILY</div>
+      </div>
+    </td>
   </tr></table>
-  <p style="margin:8px 0 0;font-size:13px;color:#94a3b8">Top threats from the last 24 hours. ${articles.length} reports from verified sources.</p>
+  <p style="margin:12px 0 0;font-size:13px;color:#94a3b8;line-height:1.5">Top threats from the last 24 hours. ${articles.length} reports from verified sources.</p>
 </td></tr>
 
-<!-- Stats -->
-<tr><td style="padding:0 24px 16px">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#1e293b;border-radius:6px">
+<!-- Stats Bar -->
+<tr><td style="padding:0 28px">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#1e293b;border-radius:8px">
     <tr>
-      <td width="33%" style="padding:12px;text-align:center;border-right:1px solid #334155">
-        <div style="font-size:20px;font-weight:700;font-family:monospace;color:#dc2626">${criticalArticles.length}</div>
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#64748b">Critical</div>
+      <td width="33%" style="padding:14px 12px;text-align:center;border-right:1px solid #334155">
+        <div style="font-size:22px;font-weight:700;font-family:monospace;color:#dc2626">${criticalArticles.length}</div>
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;margin-top:2px">Critical</div>
       </td>
-      <td width="33%" style="padding:12px;text-align:center;border-right:1px solid #334155">
-        <div style="font-size:20px;font-weight:700;font-family:monospace;color:#ea580c">${highArticles.length}</div>
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#64748b">High</div>
+      <td width="33%" style="padding:14px 12px;text-align:center;border-right:1px solid #334155">
+        <div style="font-size:22px;font-weight:700;font-family:monospace;color:#ea580c">${highArticles.length}</div>
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;margin-top:2px">High</div>
       </td>
-      <td width="34%" style="padding:12px;text-align:center">
-        <div style="font-size:20px;font-weight:700;font-family:monospace;color:#3b82f6">${articles.length}</div>
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#64748b">Total</div>
+      <td width="34%" style="padding:14px 12px;text-align:center">
+        <div style="font-size:22px;font-weight:700;font-family:monospace;color:#3b82f6">${articles.length}</div>
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;margin-top:2px">Total</div>
       </td>
     </tr>
   </table>
 </td></tr>
 
 <!-- Articles -->
-<tr><td style="padding:0 24px 24px">
+<tr><td style="padding:8px 28px 24px">
 <table width="100%" cellpadding="0" cellspacing="0">
   ${section("Critical Threats", criticalArticles, "#dc2626")}
   ${section("High Severity", highArticles, "#ea580c")}
@@ -127,11 +136,19 @@ function buildEmailHtml(articles: DigestArticle[], date: string) {
 </table>
 </td></tr>
 
+<!-- CTA Button -->
+<tr><td style="padding:0 28px 24px" align="center">
+  <a href="${appUrl}/intelligence" style="display:inline-block;background:#3b82f6;color:#ffffff;text-decoration:none;font-size:13px;font-weight:600;padding:10px 28px;border-radius:6px;letter-spacing:0.01em">View Full Dashboard →</a>
+</td></tr>
+
 <!-- Footer -->
-<tr><td style="padding:16px 24px;border-top:1px solid #1e293b;text-align:center">
-  <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com"}/intelligence" style="color:#3b82f6;text-decoration:none;font-size:13px;font-weight:600">Open Full Dashboard →</a>
-  <br/>
-  <span style="font-size:11px;color:#475569;line-height:2">Security Intel Hub — Institutional Cybersecurity Intelligence</span>
+<tr><td style="padding:16px 28px;border-top:1px solid #1e293b;background:#0c1222">
+  <table width="100%"><tr>
+    <td style="font-size:11px;color:#475569;line-height:1.6">
+      Security Intel Hub — Institutional Cybersecurity Intelligence<br/>
+      <a href="${appUrl}/alerts" style="color:#64748b;text-decoration:none">Manage preferences</a> · <a href="${appUrl}/help" style="color:#64748b;text-decoration:none">Help</a>
+    </td>
+  </tr></table>
 </td></tr>
 
 </table>
