@@ -39,16 +39,19 @@ function CommandDialog({
   children,
   className,
   showCloseButton = false,
-  ...props
-}: Omit<React.ComponentProps<typeof Dialog>, "children"> & {
+  open,
+  onOpenChange,
+}: {
   title?: string
   description?: string
   className?: string
   showCloseButton?: boolean
   children: React.ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }) {
   return (
-    <Dialog {...props}>
+    <Dialog open={open} onOpenChange={onOpenChange as any}>
       <DialogContent
         className={cn(
           "top-1/3 translate-y-0 overflow-hidden rounded-xl! p-0",
@@ -60,7 +63,9 @@ function CommandDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        {children}
+        <Command className="**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:font-medium **:[[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3">
+          {children}
+        </Command>
       </DialogContent>
     </Dialog>
   )
