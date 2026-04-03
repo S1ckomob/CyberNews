@@ -32,8 +32,9 @@ export function ThreatTicker() {
       const { data } = await supabase
         .from("articles")
         .select("title, slug, threat_level, source, published_at")
+        .in("threat_level", ["critical", "high"])
         .order("published_at", { ascending: false })
-        .limit(20);
+        .limit(50);
       if (data) setArticles(data as typeof articles);
     }
     load();
