@@ -152,16 +152,8 @@ export function Navbar() {
           </Popover>
         </nav>
 
-        {/* Right side — search, live, controls */}
+        {/* Right side — live, controls */}
         <div className="hidden items-center gap-2 lg:flex">
-          <button
-            onClick={() => setCommandOpen(true)}
-            className="flex items-center gap-2 rounded-md border border-input bg-card px-2.5 py-1 text-xs text-muted-foreground hover:bg-accent transition-colors"
-          >
-            <Search className="h-3 w-3" aria-hidden="true" />
-            <span className="hidden xl:inline">Search</span>
-            <kbd className="rounded bg-muted px-1 py-0.5 font-mono text-[10px]" aria-label="Command K shortcut">⌘K</kbd>
-          </button>
           <div className="flex items-center gap-1.5 rounded-full bg-threat-critical/10 px-2 py-0.5 text-[10px] font-bold text-threat-critical">
             <span className="h-1.5 w-1.5 rounded-full bg-threat-critical animate-threat-pulse" />
             LIVE
@@ -171,14 +163,6 @@ export function Navbar() {
 
         {/* Mobile */}
         <div className="flex items-center gap-2 lg:hidden">
-          <button
-            onClick={() => setCommandOpen(true)}
-            className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-muted-foreground hover:bg-accent transition-colors"
-            aria-label="Search (⌘K)"
-          >
-            <Search className="h-4 w-4" />
-            <kbd className="rounded bg-muted px-1 py-0.5 font-mono text-[9px]">⌘K</kbd>
-          </button>
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger className="rounded-md p-1.5 text-muted-foreground hover:bg-accent transition-colors" aria-label="Open navigation menu">
               {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
