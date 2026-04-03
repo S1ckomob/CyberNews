@@ -164,7 +164,6 @@ export function Navbar() {
             <span className="h-1.5 w-1.5 rounded-full bg-threat-critical animate-threat-pulse" />
             LIVE
           </div>
-          <NotificationManager />
           <ThemeToggle />
         </div>
 
@@ -207,7 +206,6 @@ export function Navbar() {
                 })}
                 <div className="mt-4 px-3 flex items-center gap-2">
                   <ThemeToggle />
-                  <NotificationManager />
                 </div>
               </nav>
             </SheetContent>
