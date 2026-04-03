@@ -93,7 +93,7 @@ function guessCategory(text: string): string {
   if (t.includes("ransomware")) return "ransomware";
   if (t.includes("zero-day") || t.includes("0-day")) return "zero-day";
   if (t.includes("data breach") || t.includes("data leak")) return "data-breach";
-  if (t.includes("supply chain") || t.includes("supply-chain")) return "supply-chain";
+  if (t.includes("supply chain") || t.includes("supply-chain") || t.includes("npm") || t.includes("pypi") || t.includes("malicious package") || t.includes("dependency confusion")) return "supply-chain";
   if (t.includes("apt") || t.includes("state-sponsored") || t.includes("espionage")) return "apt";
   if (t.includes("malware") || t.includes("trojan") || t.includes("botnet")) return "malware";
   if (t.includes("phishing")) return "phishing";
@@ -146,6 +146,13 @@ const RSS_FEEDS: RSSFeedConfig[] = [
   { url: "https://www.mandiant.com/resources/blog/rss.xml", source: "Mandiant", maxItems: 15 },
   { url: "https://blog.qualys.com/feed", source: "Qualys Blog", maxItems: 10 },
   { url: "https://www.rapid7.com/blog/rss/", source: "Rapid7", maxItems: 10 },
+
+  // Tier 5 — Developer / AppSec
+  { url: "https://github.blog/tag/security/feed/", source: "GitHub Security Blog", maxItems: 15 },
+  { url: "https://snyk.io/blog/feed/", source: "Snyk", maxItems: 15 },
+  { url: "https://socket.dev/blog/feed", source: "Socket (Supply Chain)", maxItems: 10 },
+  { url: "https://nodejs.org/en/feed/vulnerability.xml", source: "Node.js Security", maxItems: 10 },
+  { url: "https://blog.sonatype.com/rss.xml", source: "Sonatype (Maven/npm)", maxItems: 10 },
 ];
 
 async function fetchRSSFeed(config: RSSFeedConfig): Promise<IngestArticle[]> {
