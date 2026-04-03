@@ -154,7 +154,7 @@ export default async function HomePage() {
           </div>
 
           {/* Right Column — Live Feed + Trending + Newsletter */}
-          <div className="space-y-4">
+          <div className="space-y-4 min-w-0 overflow-hidden">
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-3">
@@ -181,8 +181,8 @@ export default async function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
-              <CardContent className="p-4">
+            <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5 overflow-hidden">
+              <CardContent className="p-4 overflow-hidden">
                 <div className="flex items-center gap-2 mb-1">
                   <Bell className="h-3.5 w-3.5 text-primary" />
                   <h3 className="text-[10px] font-bold uppercase tracking-widest">Threat Alerts</h3>
@@ -190,7 +190,9 @@ export default async function HomePage() {
                 <p className="text-[10px] text-muted-foreground leading-relaxed mb-3">
                   Real-time alerts for the threats that matter to you. Choose your severity levels and threat categories.
                 </p>
-                <SubscribeForm />
+                <div className="min-w-0">
+                  <SubscribeForm />
+                </div>
               </CardContent>
             </Card>
           </div>

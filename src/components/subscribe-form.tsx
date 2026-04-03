@@ -292,7 +292,7 @@ export function SubscribeForm() {
           if (!email) return;
           setStatus("customizing");
         }}
-        className="flex gap-1.5"
+        className="space-y-2"
       >
         <input
           type="email"
@@ -300,9 +300,9 @@ export function SubscribeForm() {
           onChange={(e) => { setEmail(e.target.value); setStatus("idle"); }}
           placeholder="security@company.com"
           required
-          className="flex-1 rounded-md border border-border bg-background px-2.5 py-1.5 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+          className="w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
         />
-        <Button type="submit" size="sm" className="text-xs gap-1.5 shrink-0">
+        <Button type="submit" size="sm" className="w-full text-xs gap-1.5">
           <Shield className="h-3 w-3" />
           Subscribe
         </Button>
