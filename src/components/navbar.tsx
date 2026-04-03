@@ -89,7 +89,7 @@ export function Navbar() {
         {/* Logo */}
         <div className="flex items-center gap-2 shrink-0">
           <Radar className="h-5 w-5 text-primary" />
-          <span className="text-base font-bold tracking-tight">Security Intel Hub</span>
+          <span className="text-sm sm:text-base font-bold tracking-tight">Security Intel Hub</span>
         </div>
 
         {/* Desktop nav — clean text links */}

@@ -80,7 +80,7 @@ export function ThreatTicker() {
                 <span className={cn("font-mono text-[10px] font-bold uppercase", THREAT_COLORS[article.threat_level] || THREAT_COLORS.medium)}>
                   {article.threat_level}
                 </span>
-                <span className="text-foreground/90 truncate max-w-xs">
+                <span className="text-foreground/90 truncate max-w-[200px] sm:max-w-xs">
                   {article.title.length > 60 ? article.title.slice(0, 60) + "..." : article.title}
                 </span>
                 <span className="text-muted-foreground/50 text-[10px]">{article.source}</span>

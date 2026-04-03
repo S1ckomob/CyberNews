@@ -335,7 +335,7 @@ function ContactForm() {
                 required
                 minLength={10}
                 maxLength={5000}
-                rows={5}
+                rows={4}
                 className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-y"
               />
               <p className="text-[10px] text-muted-foreground mt-1 text-right">{message.length}/5000</p>

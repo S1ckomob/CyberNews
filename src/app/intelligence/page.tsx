@@ -596,7 +596,7 @@ function IntelligenceFeed() {
               <PanelRight className="h-3.5 w-3.5" />
               Insights
             </SheetTrigger>
-            <SheetContent side="right" className="w-80 overflow-y-auto">
+            <SheetContent side="right" className="w-[85vw] sm:w-80 overflow-y-auto">
               <SheetTitle className="sr-only">Intelligence Insights</SheetTitle>
               <div className="mt-4 space-y-4">
                 {sidebarContent}

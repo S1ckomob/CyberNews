@@ -78,7 +78,7 @@ export default async function HomePage() {
                 </span>
               </div>
               <Link href="/zero-days">
-                <Button variant="ghost" size="sm" className="gap-1 text-[10px] text-threat-critical hover:text-threat-critical h-6">
+                <Button variant="ghost" size="sm" className="gap-1 text-[10px] text-threat-critical hover:text-threat-critical h-8">
                   View <ArrowRight className="h-2.5 w-2.5" />
                 </Button>
               </Link>
@@ -136,7 +136,7 @@ export default async function HomePage() {
               {articles[0] && <FreshnessBadge latestPublishedAt={articles[0].publishedAt} />}
               </div>
               <Link href="/intelligence">
-                <Button variant="ghost" size="sm" className="gap-1 text-xs h-6">
+                <Button variant="ghost" size="sm" className="gap-1 text-xs h-8">
                   All {articles.length}+ <ArrowRight className="h-3 w-3" />
                 </Button>
               </Link>

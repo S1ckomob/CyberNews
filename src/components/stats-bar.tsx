@@ -19,7 +19,7 @@ export async function StatsBar() {
       <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-border sm:grid-cols-4">
         {stats.map((stat) => (
           <div key={stat.label} className="px-4 py-4 text-center sm:px-6 group">
-            <div className={`font-mono text-3xl font-bold ${stat.color} drop-shadow-sm`}>
+            <div className={`font-mono text-xl sm:text-3xl font-bold ${stat.color} drop-shadow-sm`}>
               {stat.value}
             </div>
             <div className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">

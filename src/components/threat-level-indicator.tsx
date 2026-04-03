@@ -122,7 +122,7 @@ export function ThreatLevelIndicator({ articles }: { articles: Article[] }) {
           </div>
         </div>
         <div className="mt-1">
-          <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
+          <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2 sm:line-clamp-none">{description}</p>
         </div>
       </div>
     </div>
