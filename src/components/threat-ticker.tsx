@@ -39,6 +39,9 @@ export function ThreatTicker() {
     }
     load();
 
+    // Poll every 60 seconds
+    const interval = setInterval(load, 60000);
+
     let channel: ReturnType<typeof supabase.channel> | null = null;
     try {
       channel = supabase
@@ -46,10 +49,13 @@ export function ThreatTicker() {
         .on("postgres_changes", { event: "INSERT", schema: "public", table: "articles" }, () => load())
         .subscribe();
     } catch {
-      // WebSocket may not be available in all environments
+      // WebSocket may not be available — polling handles it
     }
 
-    return () => { if (channel) supabase.removeChannel(channel); };
+    return () => {
+      clearInterval(interval);
+      if (channel) supabase.removeChannel(channel);
+    };
   }, []);
 
   if (articles.length === 0) return null;

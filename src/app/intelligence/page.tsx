@@ -162,7 +162,12 @@ function IntelligenceFeed() {
 
   useEffect(() => {
     load();
-    if (!supabase) return;
+
+    // Poll for new data every 60 seconds
+    const interval = setInterval(load, 60000);
+
+    // Also try realtime if available
+    if (!supabase) return () => clearInterval(interval);
 
     let channel: ReturnType<typeof supabase.channel> | null = null;
     try {
@@ -171,9 +176,12 @@ function IntelligenceFeed() {
         .on("postgres_changes", { event: "*", schema: "public", table: "articles" }, () => load())
         .subscribe();
     } catch {
-      // WebSocket may not be available in all environments
+      // WebSocket may not be available — polling handles it
     }
-    return () => { if (channel) supabase.removeChannel(channel); };
+    return () => {
+      clearInterval(interval);
+      if (channel) supabase.removeChannel(channel);
+    };
   }, []);
 
   const filteredArticles = useMemo(() => {
