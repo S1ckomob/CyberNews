@@ -96,7 +96,7 @@ export function Navbar() {
         <nav aria-label="Primary navigation" className="hidden items-center gap-0.5 lg:flex">
           {primaryNav.map((item) => {
             const isActive = item.href === "/"
-              ? pathname === "/"
+              ? pathname === "/" || pathname === ""
               : pathname === item.href || pathname.startsWith(item.href + "/");
             return (
               <Link
@@ -171,8 +171,9 @@ export function Navbar() {
               <SheetTitle className="sr-only">Navigation</SheetTitle>
               <nav aria-label="Mobile navigation" className="mt-6 flex flex-col gap-0.5">
                 {allNav.map((item) => {
-                  const isActive =
-                    pathname === item.href || pathname.startsWith(item.href + "/");
+                  const isActive = item.href === "/"
+                    ? pathname === "/" || pathname === ""
+                    : pathname === item.href || pathname.startsWith(item.href + "/");
                   return (
                     <Link
                       key={item.name}
