@@ -153,6 +153,30 @@ const RSS_FEEDS: RSSFeedConfig[] = [
   { url: "https://socket.dev/blog/feed", source: "Socket (Supply Chain)", maxItems: 10 },
   { url: "https://nodejs.org/en/feed/vulnerability.xml", source: "Node.js Security", maxItems: 10 },
   { url: "https://blog.sonatype.com/rss.xml", source: "Sonatype (Maven/npm)", maxItems: 10 },
+
+  // Tier 6 — Healthcare
+  { url: "https://www.hipaajournal.com/feed/", source: "HIPAA Journal", maxItems: 15 },
+  { url: "https://healthitsecurity.com/feed", source: "Health IT Security", maxItems: 15 },
+  { url: "https://www.hhs.gov/feed/cybersecurity.xml", source: "HHS Cybersecurity", maxItems: 10 },
+
+  // Tier 7 — ICS / OT / Critical Infrastructure
+  { url: "https://www.dragos.com/blog/feed/", source: "Dragos (ICS/OT)", maxItems: 10 },
+  { url: "https://www.cisa.gov/news-events/ics-advisories.xml", source: "CISA ICS Advisories", maxItems: 20 },
+  { url: "https://claroty.com/team82/blog/rss", source: "Claroty Team82 (OT)", maxItems: 10 },
+
+  // Tier 8 — Mobile Security
+  { url: "https://source.android.com/docs/security/bulletin/feed.xml", source: "Android Security Bulletin", maxItems: 10 },
+  { url: "https://www.zimperium.com/blog/feed/", source: "Zimperium (Mobile)", maxItems: 10 },
+  { url: "https://www.lookout.com/blog/rss.xml", source: "Lookout (Mobile Threat)", maxItems: 10 },
+
+  // Tier 9 — Financial / Banking
+  { url: "https://www.finextra.com/rss/headlines.aspx", source: "Finextra", maxItems: 15 },
+  { url: "https://www.bankinfosecurity.com/rss-feeds", source: "Bank Info Security", maxItems: 15 },
+
+  // Tier 10 — AI / ML Security
+  { url: "https://blog.trailofbits.com/feed/", source: "Trail of Bits", maxItems: 10 },
+  { url: "https://atlas.mitre.org/rss.xml", source: "MITRE ATLAS (AI Threats)", maxItems: 10 },
+  { url: "https://embracethered.com/blog/rss/", source: "Embrace The Red (AI Sec)", maxItems: 10 },
 ];
 
 async function fetchRSSFeed(config: RSSFeedConfig): Promise<IngestArticle[]> {
