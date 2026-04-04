@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { isSaved, toggleSaved } from "@/lib/saved-articles";
-import { Bookmark, BookmarkCheck, Share2, ExternalLink, Copy, Check } from "lucide-react";
+import { Bookmark, BookmarkCheck, ExternalLink, Copy, Check, Twitter, Linkedin, Link2 } from "lucide-react";
 
 interface ArticleActionsProps {
   slug: string;
@@ -27,17 +27,33 @@ export function ArticleActions({ slug, title, sourceUrl, source }: ArticleAction
     setSaved(nowSaved);
   }
 
-  async function handleShare() {
-    const url = `${window.location.origin}/article/${slug}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title, url });
-      } catch { /* user cancelled */ }
-    } else {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+  function getArticleUrl() {
+    return `${window.location.origin}/article/${slug}`;
+  }
+
+  async function handleCopyLink() {
+    await navigator.clipboard.writeText(getArticleUrl());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  function shareToX() {
+    const url = getArticleUrl();
+    const text = `${title}`;
+    window.open(
+      `https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+      "_blank",
+      "noopener,noreferrer,width=550,height=420"
+    );
+  }
+
+  function shareToLinkedIn() {
+    const url = getArticleUrl();
+    window.open(
+      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+      "_blank",
+      "noopener,noreferrer,width=550,height=550"
+    );
   }
 
   if (!mounted) return null;
@@ -54,7 +70,7 @@ export function ArticleActions({ slug, title, sourceUrl, source }: ArticleAction
         </a>
       )}
 
-      {/* Secondary actions */}
+      {/* Save + Share actions */}
       <div className="flex gap-2">
         <Button
           variant={saved ? "default" : "outline"}
@@ -68,15 +84,31 @@ export function ArticleActions({ slug, title, sourceUrl, source }: ArticleAction
         <Button
           variant="outline"
           size="sm"
-          className="flex-1 gap-1.5 text-xs"
-          onClick={handleShare}
+          className="gap-1.5 text-xs"
+          onClick={shareToX}
+          title="Share on X"
         >
-          {copied ? <Check className="h-3.5 w-3.5 text-primary" /> : <Share2 className="h-3.5 w-3.5" />}
-          {copied ? "Copied!" : "Share"}
+          <Twitter className="h-3.5 w-3.5" />
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5 text-xs"
+          onClick={shareToLinkedIn}
+          title="Share on LinkedIn"
+        >
+          <Linkedin className="h-3.5 w-3.5" />
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5 text-xs"
+          onClick={handleCopyLink}
+          title="Copy link"
+        >
+          {copied ? <Check className="h-3.5 w-3.5 text-primary" /> : <Link2 className="h-3.5 w-3.5" />}
         </Button>
       </div>
-
-      {/* CVE external links */}
     </div>
   );
 }
