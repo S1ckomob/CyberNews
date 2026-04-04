@@ -68,9 +68,12 @@ const APP_TYPES = [
   { value: "email", label: "Email / Collaboration", keywords: ["exchange","outlook","microsoft 365","teams","gmail","email","o365","sharepoint","slack"] },
   { value: "browser", label: "Browser", keywords: ["chrome","firefox","edge","safari","webkit","chromium","browser","v8"] },
   { value: "devops", label: "DevOps / CI-CD", keywords: ["jenkins","github","gitlab","cicd","ci/cd","npm","pypi","docker","terraform","ansible","supply chain","pipeline"] },
-  { value: "mobile", label: "Mobile", keywords: ["ios","android","mobile","iphone","ipad","samsung","pixel"] },
-  { value: "ics", label: "ICS / OT / SCADA", keywords: ["scada","ics","plc","ot network","industrial","siemens","schneider","hmi","dcs","rtu"] },
+  { value: "mobile", label: "Mobile", keywords: ["ios","android","mobile","iphone","ipad","samsung","pixel","spyware","pegasus","predator","zimperium","lookout","app store","google play"] },
+  { value: "ics", label: "ICS / OT / SCADA", keywords: ["scada","ics","plc","ot network","industrial","siemens","schneider","hmi","dcs","rtu","dragos","claroty","critical infrastructure"] },
   { value: "database", label: "Database", keywords: ["sql","mysql","postgres","oracle","mongodb","redis","database","elasticsearch"] },
+  { value: "healthcare", label: "Healthcare", keywords: ["healthcare","hipaa","medical device","hospital","health it","patient data","ehr","phi","hhs","medical","telehealth","dicom"] },
+  { value: "finance", label: "Financial", keywords: ["banking","financial","swift","fintech","payment","credit card","fraud","bank","atm","trading","cryptocurrency","defi","wallet"] },
+  { value: "ai", label: "AI / ML Security", keywords: ["ai security","llm","prompt injection","model poisoning","machine learning","artificial intelligence","chatgpt","copilot","generative ai","ai model","atlas","adversarial"] },
 ] as const;
 
 function getAppTypes(article: Article): string[] {
