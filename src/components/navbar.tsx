@@ -39,38 +39,40 @@ import {
 const primaryNav = [
   { name: "Dashboard", href: "/" },
   { name: "Intelligence", href: "/intelligence" },
-  { name: "Dark Web", href: "/dark-web" },
   { name: "CVEs", href: "/cve" },
+  { name: "Dark Web", href: "/dark-web" },
   { name: "Threat Actors", href: "/threat-actors" },
 ];
 
 const moreNav = [
-  { name: "Alerts", href: "/alerts", icon: Bell },
-  { name: "Threat Map", href: "/map", icon: Globe },
-  { name: "Attack Surface", href: "/attack-surface", icon: Target },
+  // Analysis
   { name: "Executive", href: "/executive", icon: BarChart3 },
   { name: "Trends", href: "/trends", icon: TrendingUp },
-  { name: "Industries", href: "/industry", icon: Building2 },
+  // Tools
+  { name: "Threat Map", href: "/map", icon: Globe },
+  { name: "Attack Surface", href: "/attack-surface", icon: Target },
+  // Personal
   { name: "Watchlist", href: "/watchlist", icon: Eye },
   { name: "Saved", href: "/saved", icon: Bookmark },
+  { name: "Alerts", href: "/alerts", icon: Bell },
+  // Info
   { name: "Help", href: "/help", icon: HelpCircle },
   { name: "About", href: "/about", icon: Sparkles },
 ];
 
 const allNav = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Intelligence", href: "/intelligence", icon: BarChart3 },
-  { name: "CVEs", href: "/cve", icon: Search },
-  { name: "Threat Actors", href: "/threat-actors", icon: Users },
+  { name: "Intelligence", href: "/intelligence", icon: Search },
+  { name: "CVEs", href: "/cve", icon: Bug },
   { name: "Dark Web", href: "/dark-web", icon: Eye },
-  { name: "Alerts", href: "/alerts", icon: Bell },
-  { name: "Threat Map", href: "/map", icon: Globe },
-  { name: "Attack Surface", href: "/attack-surface", icon: Target },
+  { name: "Threat Actors", href: "/threat-actors", icon: Users },
   { name: "Executive", href: "/executive", icon: BarChart3 },
   { name: "Trends", href: "/trends", icon: TrendingUp },
-  { name: "Industries", href: "/industry", icon: Building2 },
+  { name: "Threat Map", href: "/map", icon: Globe },
+  { name: "Attack Surface", href: "/attack-surface", icon: Target },
   { name: "Watchlist", href: "/watchlist", icon: Eye },
   { name: "Saved", href: "/saved", icon: Bookmark },
+  { name: "Alerts", href: "/alerts", icon: Bell },
   { name: "Help", href: "/help", icon: HelpCircle },
   { name: "About", href: "/about", icon: Sparkles },
 ];
