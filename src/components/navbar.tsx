@@ -39,6 +39,7 @@ import {
 const primaryNav = [
   { name: "Dashboard", href: "/" },
   { name: "Intelligence", href: "/intelligence" },
+  { name: "Dark Web", href: "/dark-web" },
   { name: "CVEs", href: "/cve" },
   { name: "Threat Actors", href: "/threat-actors" },
 ];
@@ -61,6 +62,7 @@ const allNav = [
   { name: "Intelligence", href: "/intelligence", icon: BarChart3 },
   { name: "CVEs", href: "/cve", icon: Search },
   { name: "Threat Actors", href: "/threat-actors", icon: Users },
+  { name: "Dark Web", href: "/dark-web", icon: Eye },
   { name: "Alerts", href: "/alerts", icon: Bell },
   { name: "Threat Map", href: "/map", icon: Globe },
   { name: "Attack Surface", href: "/attack-surface", icon: Target },

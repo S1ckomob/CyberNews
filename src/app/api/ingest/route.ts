@@ -92,7 +92,7 @@ function guessCategory(text: string): string {
   const t = text.toLowerCase();
   if (t.includes("ransomware")) return "ransomware";
   if (t.includes("zero-day") || t.includes("0-day")) return "zero-day";
-  if (t.includes("data breach") || t.includes("data leak")) return "data-breach";
+  if (t.includes("data breach") || t.includes("data leak") || t.includes("leak site") || t.includes("dark web") || t.includes("darknet") || t.includes("stolen data") || t.includes("credentials leaked") || t.includes("pwned")) return "data-breach";
   if (t.includes("supply chain") || t.includes("supply-chain") || t.includes("npm") || t.includes("pypi") || t.includes("malicious package") || t.includes("dependency confusion")) return "supply-chain";
   if (t.includes("apt") || t.includes("state-sponsored") || t.includes("espionage")) return "apt";
   if (t.includes("malware") || t.includes("trojan") || t.includes("botnet")) return "malware";
@@ -177,6 +177,13 @@ const RSS_FEEDS: RSSFeedConfig[] = [
   { url: "https://blog.trailofbits.com/feed/", source: "Trail of Bits", maxItems: 10 },
   { url: "https://atlas.mitre.org/rss.xml", source: "MITRE ATLAS (AI Threats)", maxItems: 10 },
   { url: "https://embracethered.com/blog/rss/", source: "Embrace The Red (AI Sec)", maxItems: 10 },
+
+  // Tier 11 — Dark Web / Underground Monitoring
+  { url: "https://darkfeed.io/feed/", source: "DarkFeed (Ransomware Leaks)", maxItems: 20 },
+  { url: "https://ransomwatch.telemetry.ltd/posts/feed", source: "RansomWatch", maxItems: 20 },
+  { url: "https://www.databreaches.net/feed/", source: "DataBreaches.net", maxItems: 15 },
+  { url: "https://haveibeenpwned.com/rss/breaches", source: "Have I Been Pwned", maxItems: 15 },
+  { url: "https://www.coveware.com/blog/rss.xml", source: "Coveware (Ransomware Intel)", maxItems: 10 },
 ];
 
 async function fetchRSSFeed(config: RSSFeedConfig): Promise<IngestArticle[]> {

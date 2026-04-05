@@ -29,6 +29,7 @@ import {
   Lock,
   Monitor,
   Zap,
+  Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -74,6 +75,7 @@ const APP_TYPES = [
   { value: "healthcare", label: "Healthcare", keywords: ["healthcare","hipaa","medical device","hospital","health it","patient data","ehr","phi","hhs","medical","telehealth","dicom"] },
   { value: "finance", label: "Financial", keywords: ["banking","financial","swift","fintech","payment","credit card","fraud","bank","atm","trading","cryptocurrency","defi","wallet"] },
   { value: "ai", label: "AI / ML Security", keywords: ["ai security","llm","prompt injection","model poisoning","machine learning","artificial intelligence","chatgpt","copilot","generative ai","ai model","atlas","adversarial"] },
+  { value: "darkweb", label: "Dark Web", keywords: ["dark web","darknet","leak site","underground","tor","onion","stolen data","credentials leaked","dark forum","initial access broker","pwned","data breach","ransom leak","ransomwatch","darkfeed"] },
 ] as const;
 
 function getAppTypes(article: Article): string[] {
@@ -103,6 +105,7 @@ const PRESETS = [
   { id: "firewall", label: "Firewalls", icon: Shield, category: undefined as Category | undefined, appType: "firewall" },
   { id: "microsoft", label: "Microsoft", icon: Monitor, category: undefined as Category | undefined, appType: "endpoint" },
   { id: "supply-chain", label: "Supply Chain", icon: Zap, category: "supply-chain" as Category, appType: undefined as string | undefined },
+  { id: "darkweb", label: "Dark Web", icon: Globe, category: undefined as Category | undefined, appType: "darkweb" },
 ] as const;
 
 export default function DashboardPage() {
