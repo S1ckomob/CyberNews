@@ -282,48 +282,28 @@ function IntelligenceFeed() {
         </CardContent>
       </Card>
 
-      {/* Category Breakdown */}
+      {/* Category Breakdown — clickable filters */}
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center gap-2 mb-3">
             <BarChart3 className="h-4 w-4 text-primary" />
             <h3 className="text-xs font-semibold uppercase tracking-wider">
-              By Category
+              Filter by Category
             </h3>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1">
             {categoryCounts.slice(0, 8).map(([cat, count]) => (
               <button
                 key={cat}
                 onClick={() => toggleFilter(categoryFilters, cat as Category, setCategoryFilters)}
-                className="flex items-center justify-between w-full text-xs hover:bg-accent rounded px-2 py-1 transition-colors"
+                className={cn(
+                  "flex items-center justify-between w-full text-xs rounded px-2 py-1.5 transition-colors",
+                  categoryFilters.includes(cat as Category) ? "bg-primary/10 text-foreground" : "hover:bg-accent text-muted-foreground"
+                )}
               >
-                <span className="capitalize text-muted-foreground">{cat.replace("-", " ")}</span>
-                <div className="flex items-center gap-2">
-                  <div className="h-1.5 rounded-full bg-primary/20 w-16">
-                    <div
-                      className="h-1.5 rounded-full bg-primary"
-                      style={{ width: `${Math.min(100, (count / articles.length) * 100)}%` }}
-                    />
-                  </div>
-                  <span className="font-mono font-medium text-foreground w-6 text-right">{count}</span>
-                </div>
+                <span className="capitalize">{cat.replace("-", " ")}</span>
+                <span className="font-mono font-medium w-6 text-right">{count}</span>
               </button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Trending */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="h-4 w-4 text-primary" />
-            <h3 className="text-xs font-semibold uppercase tracking-wider">Trending</h3>
-          </div>
-          <div className="space-y-1">
-            {articles.slice(0, 6).map((a) => (
-              <ArticleCard key={a.id} article={a} variant="compact" />
             ))}
           </div>
         </CardContent>
@@ -375,23 +355,6 @@ function IntelligenceFeed() {
         </Card>
       )}
 
-      {/* Sources */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Shield className="h-4 w-4 text-muted-foreground" />
-            <h3 className="text-xs font-semibold uppercase tracking-wider">Sources</h3>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {[...allSources].slice(0, 12).map((s) => (
-              <Badge key={s} variant="secondary" className="text-[10px]">{s}</Badge>
-            ))}
-            {allSources.size > 12 && (
-              <Badge variant="secondary" className="text-[10px]">+{allSources.size - 12} more</Badge>
-            )}
-          </div>
-        </CardContent>
-      </Card>
     </>
   );
 
@@ -400,9 +363,9 @@ function IntelligenceFeed() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Intelligence Feed</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Search Intelligence</h1>
           <p className="text-sm text-muted-foreground">
-            All threat intelligence — search, filter, and monitor
+            {loading ? "Loading..." : `${articles.length} reports from ${allSources.size} sources`} — search, filter, and drill down
             {lastUpdated && (
               <span className="ml-2 text-xs">
                 &middot; Updated {lastUpdated.toLocaleTimeString()}
@@ -450,69 +413,6 @@ function IntelligenceFeed() {
           );
         })}
       </div>
-
-      {/* Stats Row */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:grid-cols-6 mb-6">
-        <Card className="border-threat-critical/20 bg-threat-critical/5">
-          <CardContent className="p-3 text-center">
-            <div className="text-xl font-mono font-bold text-threat-critical">{criticalCount}</div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Critical</div>
-          </CardContent>
-        </Card>
-        <Card className="border-threat-high/20 bg-threat-high/5">
-          <CardContent className="p-3 text-center">
-            <div className="text-xl font-mono font-bold text-threat-high">{highCount}</div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">High</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-3 text-center">
-            <div className="text-xl font-mono font-bold text-primary">{zeroDayCount}</div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Zero-Days</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-3 text-center">
-            <div className="text-xl font-mono font-bold text-primary">{allCves.size}</div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">CVEs</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-3 text-center">
-            <div className="text-xl font-mono font-bold text-foreground">{articles.length}</div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Reports</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-3 text-center">
-            <div className="text-xl font-mono font-bold text-foreground">{allSources.size}</div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Sources</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Situation Overview */}
-      {!loading && last24h.length > 0 && (
-        <Card className="mb-6 border-primary/20 bg-gradient-to-br from-card to-primary/5">
-          <CardContent className="p-4">
-            <h2 className="text-xs font-semibold uppercase tracking-wider mb-2">Situation Overview</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {last24h.filter((a) => a.threatLevel === "critical").length > 0
-                ? `${last24h.filter((a) => a.threatLevel === "critical").length} critical threat${last24h.filter((a) => a.threatLevel === "critical").length > 1 ? "s" : ""} detected in the last 24 hours. `
-                : "No critical threats in the last 24 hours. "}
-              {zeroDayCount > 0
-                ? `${zeroDayCount} actively exploited zero-day${zeroDayCount > 1 ? "s" : ""} tracked. `
-                : ""}
-              {ransomwareCount > 0
-                ? `${ransomwareCount} ransomware report${ransomwareCount > 1 ? "s" : ""} in the last 72 hours. `
-                : ""}
-              {activeActors.length > 0
-                ? `${activeActors.length} named threat actor${activeActors.length > 1 ? "s" : ""} active: ${activeActors.slice(0, 4).join(", ")}${activeActors.length > 4 ? ` +${activeActors.length - 4} more` : ""}.`
-                : ""}
-            </p>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Search + Filter bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center mb-4">
