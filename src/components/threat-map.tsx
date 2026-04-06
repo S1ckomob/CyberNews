@@ -90,28 +90,6 @@ export function ThreatMap({ articles, compact = false }: ThreatMapProps) {
             />
 
             {/* Threat dots */}
-            {/* Connection lines between related points */}
-            {selected && !compact && relatedPointIds.size > 1 && (() => {
-              const relatedPts = points.filter((p) => relatedPointIds.has(p.point.id));
-              const lines: React.ReactNode[] = [];
-              for (let i = 0; i < relatedPts.length; i++) {
-                for (let j = i + 1; j < relatedPts.length; j++) {
-                  lines.push(
-                    <line
-                      key={`${relatedPts[i].point.id}-${relatedPts[j].point.id}`}
-                      x1={relatedPts[i].point.x} y1={relatedPts[i].point.y}
-                      x2={relatedPts[j].point.x} y2={relatedPts[j].point.y}
-                      stroke={THREAT_COLORS[selected.maxLevel] || THREAT_COLORS.medium}
-                      strokeWidth="0.8"
-                      strokeDasharray="4 3"
-                      opacity="0.3"
-                    />
-                  );
-                }
-              }
-              return <g>{lines}</g>;
-            })()}
-
             {/* Threat dots */}
             {points.map((pt) => {
               const color = THREAT_COLORS[pt.maxLevel] || THREAT_COLORS.medium;
