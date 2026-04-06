@@ -133,7 +133,7 @@ export default async function HomePage() {
               <div className="flex items-center gap-2">
                 <Clock className="h-3.5 w-3.5 text-primary" />
                 <h2 className="text-xs font-bold uppercase tracking-widest">Latest Intelligence</h2>
-              {articles[0] && <FreshnessBadge latestPublishedAt={articles[0].publishedAt} />}
+              <FreshnessBadge />
               </div>
               <Link href="/intelligence">
                 <Button variant="ghost" size="sm" className="gap-1 text-xs h-8">
