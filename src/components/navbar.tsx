@@ -41,6 +41,7 @@ const primaryNav = [
   { name: "Intelligence", href: "/intelligence" },
   { name: "CVEs", href: "/cve" },
   { name: "Dark Web", href: "/dark-web" },
+  { name: "Blogs", href: "/blogs" },
   { name: "Threat Actors", href: "/threat-actors" },
 ];
 
@@ -65,6 +66,7 @@ const allNav = [
   { name: "Intelligence", href: "/intelligence", icon: Search },
   { name: "CVEs", href: "/cve", icon: Bug },
   { name: "Dark Web", href: "/dark-web", icon: Eye },
+  { name: "Blogs", href: "/blogs", icon: Bookmark },
   { name: "Threat Actors", href: "/threat-actors", icon: Users },
   { name: "Executive", href: "/executive", icon: BarChart3 },
   { name: "Trends", href: "/trends", icon: TrendingUp },
