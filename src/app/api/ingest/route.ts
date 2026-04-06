@@ -183,6 +183,24 @@ const RSS_FEEDS: RSSFeedConfig[] = [
   { url: "https://www.databreaches.net/feed/", source: "DataBreaches.net", maxItems: 15 },
   { url: "https://haveibeenpwned.com/rss/breaches", source: "Have I Been Pwned", maxItems: 15 },
   { url: "https://www.coveware.com/blog/rss.xml", source: "Coveware (Ransomware Intel)", maxItems: 10 },
+
+  // Tier 12 — Reddit Cybersecurity
+  { url: "https://www.reddit.com/r/cybersecurity/.rss", source: "r/cybersecurity", maxItems: 20 },
+  { url: "https://www.reddit.com/r/netsec/.rss", source: "r/netsec", maxItems: 15 },
+  { url: "https://www.reddit.com/r/malware/.rss", source: "r/malware", maxItems: 10 },
+  { url: "https://www.reddit.com/r/blueteamsec/.rss", source: "r/blueteamsec", maxItems: 10 },
+  { url: "https://www.reddit.com/r/ransomware/.rss", source: "r/ransomware", maxItems: 10 },
+
+  // Tier 13 — Security Blogs & Research
+  { url: "https://blog.google/threat-analysis-group/rss/", source: "Google TAG Blog", maxItems: 10 },
+  { url: "https://msrc.microsoft.com/blog/feed", source: "Microsoft MSRC", maxItems: 15 },
+  { url: "https://aws.amazon.com/security/security-bulletins/rss/feed/", source: "AWS Security Bulletins", maxItems: 10 },
+  { url: "https://www.schneier.com/feed/", source: "Schneier on Security", maxItems: 10 },
+  { url: "https://isc.sans.edu/rssfeed.xml", source: "SANS ISC", maxItems: 15 },
+  { url: "https://www.troyhunt.com/rss/", source: "Troy Hunt", maxItems: 10 },
+  { url: "https://portswigger.net/daily-swig/rss", source: "PortSwigger Daily Swig", maxItems: 15 },
+  { url: "https://thehackernews.com/feeds/posts/default", source: "The Hacker News (Blog)", maxItems: 15 },
+  { url: "https://grahamcluley.com/feed/", source: "Graham Cluley", maxItems: 10 },
 ];
 
 async function fetchRSSFeed(config: RSSFeedConfig): Promise<IngestArticle[]> {

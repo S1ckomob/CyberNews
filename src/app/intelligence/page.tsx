@@ -76,6 +76,8 @@ const APP_TYPES = [
   { value: "finance", label: "Financial", keywords: ["banking","financial","swift","fintech","payment","credit card","fraud","bank","atm","trading","cryptocurrency","defi","wallet"] },
   { value: "ai", label: "AI / ML Security", keywords: ["ai security","llm","prompt injection","model poisoning","machine learning","artificial intelligence","chatgpt","copilot","generative ai","ai model","atlas","adversarial"] },
   { value: "darkweb", label: "Dark Web", keywords: ["dark web","darknet","leak site","underground","tor","onion","stolen data","credentials leaked","dark forum","initial access broker","pwned","data breach","ransom leak","ransomwatch","darkfeed"] },
+  { value: "community", label: "Reddit / Community", keywords: ["r/cybersecurity","r/netsec","r/malware","r/blueteamsec","r/ransomware","reddit"] },
+  { value: "blog", label: "Blogs & Research", keywords: ["schneier","troy hunt","graham cluley","portswigger","sans isc","msrc","google tag blog","daily swig"] },
 ] as const;
 
 function getAppTypes(article: Article): string[] {
