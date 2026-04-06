@@ -242,6 +242,18 @@ async function fetchRSSFeed(config: RSSFeedConfig): Promise<IngestArticle[]> {
 
       if (!title) return null;
 
+      // Skip articles with useless/gated content
+      const lowerDesc = description.toLowerCase();
+      if (
+        lowerDesc.includes("you must login") ||
+        lowerDesc.includes("you must log in") ||
+        lowerDesc.includes("sign in to view") ||
+        lowerDesc.includes("subscribe to read") ||
+        lowerDesc.includes("premium content") ||
+        lowerDesc.includes("members only") ||
+        (description.length < 20 && !title.match(/CVE-/i))
+      ) return null;
+
       // For Twitter/Nitter feeds: title is often the full tweet, description has HTML
       const isTwitter = config.source.includes("(X)");
       let displayTitle = title;
