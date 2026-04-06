@@ -120,25 +120,24 @@ export function ThreatMap({ articles, compact = false }: ThreatMapProps) {
                       fill="none" stroke={color} strokeWidth="0.8" opacity="0.3" className="animate-threat-pulse" />
                   )}
                   <circle cx={pt.point.x} cy={pt.point.y} r={radius + 3}
-                    fill={color} opacity={isHighlighted ? "0.2" : isDimmed ? "0.03" : "0.08"} />
+                    fill={color} opacity={isHighlighted ? "0.25" : isDimmed ? "0" : "0.08"} />
                   {!compact && (
                     <circle cx={pt.point.x} cy={pt.point.y} r={radius + 8}
                       fill="transparent" />
                   )}
                   <circle cx={pt.point.x} cy={pt.point.y} r={radius}
-                    fill={color} opacity={isHighlighted ? "1" : isDimmed ? "0.25" : "0.75"} />
-                  {!compact && pt.count > 1 && radius >= 6 && (
+                    fill={color} opacity={isHighlighted ? "1" : isDimmed ? "0.08" : "0.75"} />
+                  {!compact && pt.count > 1 && radius >= 6 && !isDimmed && (
                     <text x={pt.point.x} y={pt.point.y + 1}
                       textAnchor="middle" dominantBaseline="central"
-                      fill="white" fontSize="7" fontWeight="700" fontFamily="monospace"
-                      opacity={isDimmed ? "0.3" : "1"}>
+                      fill="white" fontSize="7" fontWeight="700" fontFamily="monospace">
                       {pt.count}
                     </text>
                   )}
                   {!compact && (
                     <text x={pt.point.x} y={pt.point.y + radius + 10}
                       textAnchor="middle" fill="currentColor"
-                      fontSize="6" fontWeight="600" opacity={isHighlighted ? "0.7" : isDimmed ? "0.1" : "0.25"}
+                      fontSize="6" fontWeight="600" opacity={isHighlighted ? "0.8" : isDimmed ? "0" : "0.25"}
                       fontFamily="monospace">
                       {pt.point.label}
                     </text>
