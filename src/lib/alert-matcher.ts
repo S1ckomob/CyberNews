@@ -174,7 +174,7 @@ function buildAlertEmail(articles: AlertArticle[], rule: AlertRule): string {
   <table width="100%"><tr>
     <td style="font-size:11px;color:#475569;line-height:1.6">
       Security Intel Hub — Institutional Cybersecurity Intelligence<br/>
-      <a href="${appUrl}/alerts" style="color:#64748b;text-decoration:none">Manage alert settings</a> · <a href="${appUrl}/help" style="color:#64748b;text-decoration:none">Help</a>
+      <a href="${appUrl}/alerts" style="color:#64748b;text-decoration:none">Manage alert settings</a> · <a href="${appUrl}/help" style="color:#64748b;text-decoration:none">Help</a> · <a href="${appUrl}/api/unsubscribe?email=${encodeURIComponent(rule.email)}" style="color:#64748b;text-decoration:none">Unsubscribe</a>
     </td>
   </tr></table>
 </td></tr>

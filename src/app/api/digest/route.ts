@@ -42,7 +42,7 @@ function escapeHtml(str: string): string {
     .replace(/'/g, "&#39;");
 }
 
-function buildEmailHtml(articles: DigestArticle[], date: string) {
+function buildEmailHtml(articles: DigestArticle[], date: string, subscriberEmail?: string) {
   const criticalArticles = articles.filter((a) => a.threat_level === "critical");
   const highArticles = articles.filter((a) => a.threat_level === "high");
   const otherArticles = articles.filter((a) => a.threat_level !== "critical" && a.threat_level !== "high");
@@ -146,7 +146,7 @@ function buildEmailHtml(articles: DigestArticle[], date: string) {
   <table width="100%"><tr>
     <td style="font-size:11px;color:#475569;line-height:1.6">
       Security Intel Hub — Institutional Cybersecurity Intelligence<br/>
-      <a href="${appUrl}/alerts" style="color:#64748b;text-decoration:none">Manage preferences</a> · <a href="${appUrl}/help" style="color:#64748b;text-decoration:none">Help</a>
+      <a href="${appUrl}/alerts" style="color:#64748b;text-decoration:none">Manage preferences</a> · <a href="${appUrl}/help" style="color:#64748b;text-decoration:none">Help</a>${subscriberEmail ? ` · <a href="${appUrl}/api/unsubscribe?email=${encodeURIComponent(subscriberEmail)}" style="color:#64748b;text-decoration:none">Unsubscribe</a>` : ""}
     </td>
   </tr></table>
 </td></tr>
@@ -242,7 +242,7 @@ export async function POST(request: NextRequest) {
       // Skip if no matching articles for this subscriber
       if (personalizedArticles.length === 0) continue;
 
-      const html = buildEmailHtml(personalizedArticles, date);
+      const html = buildEmailHtml(personalizedArticles, date, email);
 
       try {
         await getResend().emails.send({
