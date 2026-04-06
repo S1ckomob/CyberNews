@@ -171,15 +171,17 @@ export function ThreatMap({ articles, compact = false }: ThreatMapProps) {
           </svg>
 
           {!compact && (
-            <div className="flex items-center gap-3 mt-2 text-[10px] text-muted-foreground">
-              <span className="text-muted-foreground/50">Click a dot to see threats</span>
-              <span className="ml-auto" />
-              {(["critical", "high", "medium", "low"] as const).map((level) => (
-                <span key={level} className="flex items-center gap-1 capitalize">
-                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: THREAT_COLORS[level] }} />
-                  {level}
-                </span>
-              ))}
+            <div className="mt-2 space-y-1">
+              <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+                <span className="text-muted-foreground/50">Click a region to see threats — connected regions will highlight</span>
+                <span className="ml-auto" />
+                {(["critical", "high", "medium", "low"] as const).map((level) => (
+                  <span key={level} className="flex items-center gap-1 capitalize">
+                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: THREAT_COLORS[level] }} />
+                    {level}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
         </div>
