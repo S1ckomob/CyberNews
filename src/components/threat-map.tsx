@@ -44,6 +44,20 @@ export function ThreatMap({ articles, compact = false }: ThreatMapProps) {
   }, [articles]);
 
   const selected = points.find((p) => p.point.id === selectedId);
+
+  // Find all points that share articles with the selected point
+  const relatedPointIds = useMemo(() => {
+    if (!selected) return new Set<string>();
+    const articleIds = new Set(selected.articles.map((a) => a.id));
+    const related = new Set<string>();
+    for (const pt of points) {
+      if (pt.articles.some((a) => articleIds.has(a.id))) {
+        related.add(pt.point.id);
+      }
+    }
+    return related;
+  }, [selected, points]);
+
   const viewBox = compact ? "30 60 940 380" : "0 20 1000 460";
 
   return (
@@ -76,9 +90,35 @@ export function ThreatMap({ articles, compact = false }: ThreatMapProps) {
             />
 
             {/* Threat dots */}
+            {/* Connection lines between related points */}
+            {selected && !compact && relatedPointIds.size > 1 && (() => {
+              const relatedPts = points.filter((p) => relatedPointIds.has(p.point.id));
+              const lines: React.ReactNode[] = [];
+              for (let i = 0; i < relatedPts.length; i++) {
+                for (let j = i + 1; j < relatedPts.length; j++) {
+                  lines.push(
+                    <line
+                      key={`${relatedPts[i].point.id}-${relatedPts[j].point.id}`}
+                      x1={relatedPts[i].point.x} y1={relatedPts[i].point.y}
+                      x2={relatedPts[j].point.x} y2={relatedPts[j].point.y}
+                      stroke={THREAT_COLORS[selected.maxLevel] || THREAT_COLORS.medium}
+                      strokeWidth="0.8"
+                      strokeDasharray="4 3"
+                      opacity="0.3"
+                    />
+                  );
+                }
+              }
+              return <g>{lines}</g>;
+            })()}
+
+            {/* Threat dots */}
             {points.map((pt) => {
               const color = THREAT_COLORS[pt.maxLevel] || THREAT_COLORS.medium;
               const isSelected = selectedId === pt.point.id;
+              const isRelated = relatedPointIds.has(pt.point.id) && selectedId !== null;
+              const isHighlighted = isSelected || isRelated;
+              const isDimmed = selectedId !== null && !isHighlighted;
               const radius = compact
                 ? Math.min(2.5 + pt.count * 0.8, 8)
                 : Math.min(4 + pt.count * 1, 14);
@@ -93,29 +133,34 @@ export function ThreatMap({ articles, compact = false }: ThreatMapProps) {
                     <circle cx={pt.point.x} cy={pt.point.y} r={radius + 7}
                       fill="none" stroke="white" strokeWidth="1.5" opacity="0.6" />
                   )}
-                  {pt.maxLevel === "critical" && (
+                  {isRelated && !isSelected && (
+                    <circle cx={pt.point.x} cy={pt.point.y} r={radius + 6}
+                      fill="none" stroke={color} strokeWidth="1" opacity="0.4" />
+                  )}
+                  {pt.maxLevel === "critical" && !isDimmed && (
                     <circle cx={pt.point.x} cy={pt.point.y} r={radius + 4}
                       fill="none" stroke={color} strokeWidth="0.8" opacity="0.3" className="animate-threat-pulse" />
                   )}
                   <circle cx={pt.point.x} cy={pt.point.y} r={radius + 3}
-                    fill={color} opacity={isSelected ? "0.2" : "0.08"} />
+                    fill={color} opacity={isHighlighted ? "0.2" : isDimmed ? "0.03" : "0.08"} />
                   {!compact && (
                     <circle cx={pt.point.x} cy={pt.point.y} r={radius + 8}
                       fill="transparent" />
                   )}
                   <circle cx={pt.point.x} cy={pt.point.y} r={radius}
-                    fill={color} opacity={isSelected ? "1" : "0.75"} />
+                    fill={color} opacity={isHighlighted ? "1" : isDimmed ? "0.25" : "0.75"} />
                   {!compact && pt.count > 1 && radius >= 6 && (
                     <text x={pt.point.x} y={pt.point.y + 1}
                       textAnchor="middle" dominantBaseline="central"
-                      fill="white" fontSize="7" fontWeight="700" fontFamily="monospace">
+                      fill="white" fontSize="7" fontWeight="700" fontFamily="monospace"
+                      opacity={isDimmed ? "0.3" : "1"}>
                       {pt.count}
                     </text>
                   )}
                   {!compact && (
                     <text x={pt.point.x} y={pt.point.y + radius + 10}
                       textAnchor="middle" fill="currentColor"
-                      fontSize="6" fontWeight="600" opacity={isSelected ? "0.7" : "0.25"}
+                      fontSize="6" fontWeight="600" opacity={isHighlighted ? "0.7" : isDimmed ? "0.1" : "0.25"}
                       fontFamily="monospace">
                       {pt.point.label}
                     </text>
