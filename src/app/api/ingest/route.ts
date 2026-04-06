@@ -179,7 +179,6 @@ const RSS_FEEDS: RSSFeedConfig[] = [
   { url: "https://embracethered.com/blog/rss/", source: "Embrace The Red (AI Sec)", maxItems: 10 },
 
   // Tier 11 — Dark Web / Underground Monitoring
-  { url: "https://darkfeed.io/feed/", source: "DarkFeed (Ransomware Leaks)", maxItems: 20 },
   { url: "https://ransomwatch.telemetry.ltd/posts/feed", source: "RansomWatch", maxItems: 20 },
   { url: "https://www.databreaches.net/feed/", source: "DataBreaches.net", maxItems: 15 },
   { url: "https://haveibeenpwned.com/rss/breaches", source: "Have I Been Pwned", maxItems: 15 },
