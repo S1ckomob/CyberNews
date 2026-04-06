@@ -35,6 +35,19 @@ import {
   CalendarClock,
 } from "lucide-react";
 
+function stripHtml(text: string): string {
+  return text
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function formatFullDate(dateString: string) {
   return new Date(dateString).toLocaleDateString("en-US", {
     weekday: "long",
@@ -232,7 +245,7 @@ export default async function ArticlePage({
               Executive Summary
             </h2>
             <p className="text-sm leading-relaxed text-foreground/90">
-              {article.summary}
+              {stripHtml(article.summary)}
             </p>
           </div>
 
@@ -241,8 +254,8 @@ export default async function ArticlePage({
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
               Analysis
             </h2>
-            <div className="prose prose-sm prose-invert max-w-none text-sm leading-relaxed text-foreground/80">
-              {article.content}
+            <div className="prose prose-sm prose-invert max-w-none text-sm leading-relaxed text-foreground/80 whitespace-pre-line">
+              {stripHtml(article.content)}
             </div>
           </div>
 
