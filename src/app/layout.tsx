@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { ThreatTicker } from "@/components/threat-ticker";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -35,6 +36,14 @@ export const metadata: Metadata = {
     "CISO", "threat actors", "ransomware", "APT", "zero-day", "malware",
     "incident response", "MITRE ATT&CK", "CVSS", "NVD", "CISA",
     "SOC", "security operations", "cyber threat", "exploit",
+    "cybersecurity news", "cyber attack today", "latest vulnerabilities",
+    "threat intelligence platform", "CVE database", "vulnerability scanner",
+    "data breach news", "security advisory",
+    "critical vulnerability", "cybersecurity alerts", "infosec news",
+    "cyber threat map", "supply chain attack", "state-sponsored hacking",
+    "healthcare cybersecurity", "financial sector security",
+    "government cyber threats", "energy sector security",
+    "cybersecurity dashboard", "threat actor tracking",
   ],
   authors: [{ name: "Security Intel Hub", url: siteUrl }],
   creator: "Security Intel Hub",
@@ -113,36 +122,39 @@ export default function RootLayout({
                     intelligence. Trusted by security teams worldwide.
                   </p>
                 </div>
-                <div>
+                <nav aria-label="Intelligence">
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Intelligence
                   </h4>
                   <ul className="mt-3 space-y-2 text-sm">
-                    <li><a href="/intelligence" className="text-muted-foreground hover:text-foreground transition-colors">Intelligence</a></li>
-                    <li><a href="/cve" className="text-muted-foreground hover:text-foreground transition-colors">CVE Search</a></li>
-                    <li><a href="/threat-actors" className="text-muted-foreground hover:text-foreground transition-colors">Threat Actors</a></li>
+                    <li><Link href="/intelligence" className="text-muted-foreground hover:text-foreground transition-colors">Threat Intelligence Feed</Link></li>
+                    <li><Link href="/cve" className="text-muted-foreground hover:text-foreground transition-colors">CVE Database Search</Link></li>
+                    <li><Link href="/threat-actors" className="text-muted-foreground hover:text-foreground transition-colors">Threat Actor Profiles</Link></li>
+                    <li><Link href="/trends" className="text-muted-foreground hover:text-foreground transition-colors">Threat Trends</Link></li>
                   </ul>
-                </div>
-                <div>
+                </nav>
+                <nav aria-label="Industries">
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Industries
                   </h4>
                   <ul className="mt-3 space-y-2 text-sm">
-                    <li><a href="/industry/healthcare" className="text-muted-foreground hover:text-foreground transition-colors">Healthcare</a></li>
-                    <li><a href="/industry/finance" className="text-muted-foreground hover:text-foreground transition-colors">Finance</a></li>
-                    <li><a href="/industry/government" className="text-muted-foreground hover:text-foreground transition-colors">Government</a></li>
-                    <li><a href="/industry/energy" className="text-muted-foreground hover:text-foreground transition-colors">Energy</a></li>
+                    <li><Link href="/industry/healthcare" className="text-muted-foreground hover:text-foreground transition-colors">Healthcare Cybersecurity</Link></li>
+                    <li><Link href="/industry/finance" className="text-muted-foreground hover:text-foreground transition-colors">Financial Sector Security</Link></li>
+                    <li><Link href="/industry/government" className="text-muted-foreground hover:text-foreground transition-colors">Government Cyber Defense</Link></li>
+                    <li><Link href="/industry/energy" className="text-muted-foreground hover:text-foreground transition-colors">Energy Infrastructure Security</Link></li>
+                    <li><Link href="/industry/technology" className="text-muted-foreground hover:text-foreground transition-colors">Technology Sector Threats</Link></li>
                   </ul>
-                </div>
-                <div>
+                </nav>
+                <nav aria-label="Company">
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Company
                   </h4>
                   <ul className="mt-3 space-y-2 text-sm">
-                    <li><a href="/about" className="text-muted-foreground hover:text-foreground transition-colors">About</a></li>
-                    <li><a href="/help" className="text-muted-foreground hover:text-foreground transition-colors">Help & Contact</a></li>
+                    <li><Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">About</Link></li>
+                    <li><Link href="/help" className="text-muted-foreground hover:text-foreground transition-colors">Help & Contact</Link></li>
+                    <li><Link href="/map" className="text-muted-foreground hover:text-foreground transition-colors">Global Threat Map</Link></li>
                   </ul>
-                </div>
+                </nav>
               </div>
               <div className="mt-8 border-t border-border pt-6 text-center text-xs text-muted-foreground">
                 &copy; {new Date().getFullYear()} Security Intel Hub. All rights reserved. Intelligence data sourced from verified public sources.

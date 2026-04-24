@@ -65,6 +65,12 @@ const INDUSTRIES: Record<Industry, { label: string; description: string }> = {
 const ALL_INDUSTRIES = Object.keys(INDUSTRIES) as Industry[];
 
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com";
+
+export function generateStaticParams() {
+  return ALL_INDUSTRIES.map((slug) => ({ slug }));
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -73,9 +79,23 @@ export async function generateMetadata({
   const { slug } = await params;
   const industry = INDUSTRIES[slug as Industry];
   if (!industry) return { title: "Not Found" };
+  const pageUrl = `${siteUrl}/industry/${slug}`;
   return {
-    title: `${industry.label} Cybersecurity Intelligence`,
-    description: industry.description,
+    title: `${industry.label} Cybersecurity Threats & Intelligence`,
+    description: `${industry.description} Real-time threat intelligence, CVE tracking, and vulnerability alerts for the ${industry.label.toLowerCase()} sector.`,
+    alternates: { canonical: pageUrl },
+    openGraph: {
+      title: `${industry.label} Cyber Threat Intelligence | Security Intel Hub`,
+      description: industry.description,
+      type: "website",
+      url: pageUrl,
+      siteName: "Security Intel Hub",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${industry.label} Cyber Threat Intelligence`,
+      description: industry.description,
+    },
   };
 }
 
@@ -93,10 +113,40 @@ export default async function IndustryPage({
     (a) => a.threatLevel === "critical"
   ).length;
 
+  const pageUrl = `${siteUrl}/industry/${slug}`;
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Industries", item: `${siteUrl}/industry` },
+      { "@type": "ListItem", position: 3, name: industry.label, item: pageUrl },
+    ],
+  };
+  const collectionJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `${industry.label} Cybersecurity Intelligence`,
+    description: industry.description,
+    url: pageUrl,
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: industryArticles.length,
+      itemListElement: industryArticles.slice(0, 10).map((a, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `${siteUrl}/article/${a.slug}`,
+        name: a.title,
+      })),
+    },
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }} />
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1 text-xs text-muted-foreground mb-6">
+      <nav className="flex items-center gap-1 text-xs text-muted-foreground mb-6" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-foreground transition-colors">
           Home
         </Link>

@@ -11,15 +11,73 @@ import {
   Zap,
 } from "lucide-react";
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com";
+
 export const metadata = {
-  title: "About Security Intel Hub",
+  title: "About Security Intel Hub — Cybersecurity Intelligence Platform",
   description:
-    "Security Intel Hub is the institutional standard for cybersecurity intelligence. Learn about our mission, methodology, and commitment to accuracy.",
+    "Security Intel Hub is the institutional standard for cybersecurity intelligence. Real-time threat data from CISA, Mandiant, Microsoft, and other verified sources. Trusted by 15,000+ security professionals.",
+  alternates: { canonical: `${siteUrl}/about` },
+  openGraph: {
+    title: "About Security Intel Hub | Cybersecurity Intelligence Platform",
+    description: "The institutional standard for cybersecurity intelligence. Real-time threat data from verified sources.",
+    type: "website",
+    url: `${siteUrl}/about`,
+    siteName: "Security Intel Hub",
+  },
 };
 
 export default function AboutPage() {
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What is Security Intel Hub?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Security Intel Hub is the institutional standard for cybersecurity intelligence. We aggregate real-time threat data from verified sources including CISA, Microsoft Threat Intelligence, Mandiant, and other authoritative organizations. Our platform provides CVE tracking, threat actor profiles, and vulnerability alerts for security teams.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "What sources does Security Intel Hub use?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "We aggregate intelligence from CISA Advisories, Microsoft Threat Intelligence, Mandiant/Google TAG, CrowdStrike Intelligence, FBI/NSA Joint Advisories, Vendor Security Bulletins, the NVD/CVE Database, academic research, and open source intelligence (OSINT).",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How often is the threat intelligence updated?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Security Intel Hub provides real-time threat intelligence with 24/7 monitoring. Threats are published as they are verified from our source feeds, with the intelligence feed updating continuously throughout the day.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "What industries does Security Intel Hub cover?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "We track threats across all major industries including healthcare, finance, government, energy, retail, technology, education, defense, telecommunications, and manufacturing. Each industry has dedicated intelligence feeds and threat tracking.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How can I search for CVEs?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Use our CVE Database Search at securityintelhub.com/cve to search by CVE ID, affected product, vendor, or threat actor. Filter by severity level (critical, high, medium, low) to find the vulnerabilities most relevant to your organization.",
+        },
+      },
+    ],
+  };
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="text-center mb-12">
         <div className="flex items-center justify-center gap-2 mb-4">
           <Shield className="h-8 w-8 text-primary" />

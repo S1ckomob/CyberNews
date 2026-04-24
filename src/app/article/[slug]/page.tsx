@@ -69,6 +69,11 @@ function formatShortDate(dateString: string) {
 }
 
 
+export async function generateStaticParams() {
+  const slugs = await fetchArticleSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -149,6 +154,7 @@ export default async function ArticlePage({
   ].filter(Boolean) as { label: string; date: string }[];
 
   const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com";
+  const articleUrl = `${siteUrl}/article/${article.slug}`;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -157,10 +163,31 @@ export default async function ArticlePage({
     datePublished: article.publishedAt,
     dateModified: article.updatedAt,
     author: { "@type": "Organization", name: article.source, url: article.sourceUrl },
-    publisher: { "@type": "Organization", name: "Security Intel Hub", url: siteUrl },
-    url: `${siteUrl}/article/${article.slug}`,
+    publisher: {
+      "@type": "Organization",
+      name: "Security Intel Hub",
+      url: siteUrl,
+      logo: { "@type": "ImageObject", url: `${siteUrl}/icon.png` },
+    },
+    url: articleUrl,
+    mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
+    image: `${siteUrl}/og/${article.slug}`,
     keywords: article.tags.join(", "),
     articleSection: article.category,
+    about: article.cves.map((cve) => ({
+      "@type": "Thing",
+      name: cve,
+      url: `https://nvd.nist.gov/vuln/detail/${cve}`,
+    })),
+  };
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Intelligence", item: `${siteUrl}/intelligence` },
+      { "@type": "ListItem", position: 3, name: article.title, item: articleUrl },
+    ],
   };
 
   return (
@@ -169,8 +196,12 @@ export default async function ArticlePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1 text-xs text-muted-foreground mb-6">
+      <nav className="flex items-center gap-1 text-xs text-muted-foreground mb-6" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-foreground transition-colors">
           Home
         </Link>
@@ -187,7 +218,7 @@ export default async function ArticlePage({
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         {/* Main Content */}
-        <div className="space-y-6">
+        <article className="space-y-6">
           {/* Header */}
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -213,10 +244,10 @@ export default async function ArticlePage({
               {article.title}
             </h1>
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1">
+              <time dateTime={article.publishedAt} className="flex items-center gap-1">
                 <Clock className="h-3.5 w-3.5" />
                 {formatFullDate(article.publishedAt)}
-              </span>
+              </time>
               <span>&middot;</span>
               <span className="font-mono text-xs">
                 Source: {article.source}
@@ -224,7 +255,7 @@ export default async function ArticlePage({
             </div>
             {article.updatedAt !== article.publishedAt && (
               <p className="mt-1 text-xs text-muted-foreground">
-                Updated: {formatFullDate(article.updatedAt)}
+                Updated: <time dateTime={article.updatedAt}>{formatFullDate(article.updatedAt)}</time>
               </p>
             )}
           </div>
@@ -316,7 +347,7 @@ export default async function ArticlePage({
               </div>
             </div>
           )}
-        </div>
+        </article>
 
         {/* Sidebar - Metadata Cards */}
         <aside className="space-y-4">

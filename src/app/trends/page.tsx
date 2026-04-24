@@ -7,9 +7,19 @@ import { fetchArticles } from "@/lib/queries";
 import { TrendingUp, TrendingDown, Minus, BarChart3, Calendar, Target, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com";
+
 export const metadata = {
-  title: "Threat Trends & Analytics",
-  description: "Cybersecurity threat trends, category shifts, and intelligence analytics over time.",
+  title: "Cybersecurity Threat Trends & Analytics Dashboard",
+  description: "Track cybersecurity threat trends, severity shifts, attack category analytics, and emerging threat patterns over time. Data-driven intelligence for security teams.",
+  alternates: { canonical: `${siteUrl}/trends` },
+  openGraph: {
+    title: "Cybersecurity Threat Trends & Analytics | Security Intel Hub",
+    description: "Track cybersecurity threat trends, severity shifts, and emerging attack patterns.",
+    type: "website",
+    url: `${siteUrl}/trends`,
+    siteName: "Security Intel Hub",
+  },
 };
 
 function getDayKey(date: Date) {

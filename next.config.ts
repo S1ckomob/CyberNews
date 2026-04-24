@@ -50,6 +50,7 @@ const nextConfig: NextConfig = {
       { source: "/windows", destination: "/intelligence?view=microsoft", permanent: true },
       { source: "/timeline", destination: "/intelligence", permanent: true },
       { source: "/briefing", destination: "/intelligence", permanent: true },
+      { source: "/dark-web", destination: "/intelligence?view=dark-web", permanent: true },
     ];
   },
 };

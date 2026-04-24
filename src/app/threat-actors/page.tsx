@@ -8,10 +8,25 @@ import { ActorGraph } from "@/components/actor-graph";
 import { fetchThreatActors, fetchArticles } from "@/lib/queries";
 import { Users, Globe, Calendar, Target, ChevronRight } from "lucide-react";
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com";
+
 export const metadata = {
-  title: "Threat Actor Profiles",
+  title: "Threat Actor Profiles — APT Groups, Ransomware Gangs & State Actors",
   description:
-    "Profiles of active threat actors tracked by Security Intel Hub intelligence analysts.",
+    "Comprehensive profiles of active threat actors including APT groups, ransomware gangs, and state-sponsored hackers. TTPs, MITRE ATT&CK mappings, target industries, and related intelligence.",
+  alternates: { canonical: `${siteUrl}/threat-actors` },
+  openGraph: {
+    title: "Threat Actor Profiles | Security Intel Hub",
+    description: "Comprehensive threat actor profiles with TTPs, MITRE ATT&CK mappings, and related intelligence.",
+    type: "website",
+    url: `${siteUrl}/threat-actors`,
+    siteName: "Security Intel Hub",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Threat Actor Profiles — APT Groups & Ransomware Gangs",
+    description: "Threat actor profiles with TTPs, MITRE ATT&CK mappings, and linked intelligence.",
+  },
 };
 
 export default async function ThreatActorsPage() {

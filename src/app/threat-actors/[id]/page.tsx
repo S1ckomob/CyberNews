@@ -26,6 +26,13 @@ import {
 } from "lucide-react";
 
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://securityintelhub.com";
+
+export async function generateStaticParams() {
+  const ids = await fetchThreatActorIds();
+  return ids.map((id) => ({ id }));
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -34,9 +41,23 @@ export async function generateMetadata({
   const { id } = await params;
   const actor = await fetchThreatActorById(id);
   if (!actor) return { title: "Not Found" };
+  const pageUrl = `${siteUrl}/threat-actors/${id}`;
   return {
-    title: `${actor.name} — Threat Actor Profile`,
-    description: actor.description,
+    title: `${actor.name} — Threat Actor Profile, TTPs & IOCs`,
+    description: `${actor.description} Origin: ${actor.origin}. Active since ${actor.firstSeen}. Targets: ${actor.targetIndustries.join(", ")}.`,
+    alternates: { canonical: pageUrl },
+    openGraph: {
+      title: `${actor.name} — Threat Actor Profile | Security Intel Hub`,
+      description: actor.description,
+      type: "article",
+      url: pageUrl,
+      siteName: "Security Intel Hub",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${actor.name} — Threat Actor Profile`,
+      description: actor.description,
+    },
   };
 }
 
@@ -56,10 +77,42 @@ export default async function ThreatActorPage({
     )
   );
 
+  const pageUrl = `${siteUrl}/threat-actors/${id}`;
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Threat Actors", item: `${siteUrl}/threat-actors` },
+      { "@type": "ListItem", position: 3, name: actor.name, item: pageUrl },
+    ],
+  };
+  const actorJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: `${actor.name} — Threat Actor Profile`,
+    description: actor.description,
+    url: pageUrl,
+    publisher: {
+      "@type": "Organization",
+      name: "Security Intel Hub",
+      url: siteUrl,
+      logo: { "@type": "ImageObject", url: `${siteUrl}/icon.png` },
+    },
+    about: {
+      "@type": "Thing",
+      name: actor.name,
+      alternateName: actor.aliases,
+      description: actor.description,
+    },
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(actorJsonLd) }} />
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1 text-xs text-muted-foreground mb-6">
+      <nav className="flex items-center gap-1 text-xs text-muted-foreground mb-6" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-foreground transition-colors">
           Home
         </Link>
