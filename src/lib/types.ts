@@ -10,7 +10,8 @@ export type Category =
   | "supply-chain"
   | "phishing"
   | "insider-threat"
-  | "ddos";
+  | "ddos"
+  | "ai";
 
 export type Industry =
   | "healthcare"

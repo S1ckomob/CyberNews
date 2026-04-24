@@ -40,7 +40,8 @@ export default async function HomePage() {
     "@type": "WebSite",
     name: "Security Intel Hub",
     url: siteUrl,
-    description: "The institutional standard for cybersecurity intelligence.",
+    description: "The institutional standard for cybersecurity intelligence. Real-time threat data, CVE tracking, and vulnerability alerts from verified sources.",
+    inLanguage: "en-US",
     potentialAction: {
       "@type": "SearchAction",
       target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/cve?q={search_term_string}` },
@@ -52,14 +53,38 @@ export default async function HomePage() {
     "@type": "Organization",
     name: "Security Intel Hub",
     url: siteUrl,
-    description: "Institutional cybersecurity threat intelligence platform.",
+    logo: `${siteUrl}/icon.png`,
+    description: "Institutional cybersecurity threat intelligence platform. Real-time CVE tracking, threat actor profiles, and vulnerability alerts for security professionals.",
+    foundingDate: "2024",
+    knowsAbout: [
+      "Cybersecurity",
+      "Threat Intelligence",
+      "Vulnerability Management",
+      "CVE Tracking",
+      "MITRE ATT&CK",
+      "Incident Response",
+    ],
     sameAs: [],
+  };
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Latest Cybersecurity Intelligence",
+    description: "The most recent cybersecurity threat intelligence from verified sources.",
+    numberOfItems: articles.length,
+    itemListElement: articles.slice(0, 10).map((a, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `${siteUrl}/article/${a.slug}`,
+      name: a.title,
+    })),
   };
 
   return (
     <div className="flex flex-col">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       {/* Global Threat Level */}
       <ThreatLevelIndicator articles={articles} />
 
@@ -172,10 +197,20 @@ export default async function HomePage() {
                   <h3 className="text-[10px] font-bold uppercase tracking-widest">Trending</h3>
                 </div>
                 <div className="flex flex-wrap gap-1 mb-3">
-                  {["zero-day", "ransomware", "critical-infrastructure", "supply-chain", "state-sponsored", "ai-threats", "cloud"].map((tag) => (
-                    <Badge key={tag} variant="outline" className="font-mono text-[9px] cursor-pointer hover:bg-accent">
-                      #{tag}
-                    </Badge>
+                  {([
+                    { tag: "zero-day", href: "/intelligence?view=zero-day" },
+                    { tag: "ransomware", href: "/intelligence?view=ransomware" },
+                    { tag: "critical-infrastructure", href: "/industry/energy" },
+                    { tag: "supply-chain", href: "/intelligence?view=supply-chain" },
+                    { tag: "state-sponsored", href: "/threat-actors" },
+                    { tag: "ai-threats", href: "/ai-news" },
+                    { tag: "cloud", href: "/intelligence" },
+                  ] as const).map(({ tag, href }) => (
+                    <Link key={tag} href={href}>
+                      <Badge variant="outline" className="font-mono text-[9px] cursor-pointer hover:bg-accent">
+                        #{tag}
+                      </Badge>
+                    </Link>
                   ))}
                 </div>
               </CardContent>

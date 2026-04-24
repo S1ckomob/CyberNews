@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import {
   CheckCircle, Loader2, Shield, Bell, Zap,
   Bug, Lock, Globe, Monitor, Mail, Target,
-  Server, Search, X,
+  Server, Search, X, Brain,
 } from "lucide-react";
 import { csrfHeaders } from "@/lib/csrf-client";
 import { cn } from "@/lib/utils";
@@ -20,6 +20,7 @@ const CATEGORIES = [
   { value: "malware", label: "Malware", icon: Monitor, color: "text-threat-medium" },
   { value: "supply-chain", label: "Supply Chain", icon: Zap, color: "text-threat-medium" },
   { value: "phishing", label: "Phishing", icon: Mail, color: "text-muted-foreground" },
+  { value: "ai", label: "AI / ML", icon: Brain, color: "text-threat-medium" },
 ] as const;
 
 const SEVERITIES = [

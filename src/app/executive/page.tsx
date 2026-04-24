@@ -38,6 +38,13 @@ export default async function ExecutivePage() {
   const zeroDays7d = last7d.filter((a) => a.category === "zero-day" || a.tags.some((t) => t.includes("zero-day")));
   const ransomware7d = last7d.filter((a) => a.category === "ransomware" || a.tags.some((t) => t.includes("ransomware")));
   const supplyChain7d = last7d.filter((a) => a.category === "supply-chain");
+  const ai7d = last7d.filter((a) => {
+    if (a.category === "ai") return true;
+    const hay = `${a.title} ${a.summary} ${a.tags.join(" ")}`.toLowerCase();
+    return /prompt injection|jailbreak|llm|large language model|generative ai|model poisoning|deepfake|chatgpt|copilot|anthropic|claude |gemini|agentic|model context protocol/.test(hay);
+  });
+  const aiPrev7d = prev7d.filter((a) => a.category === "ai").length;
+  const aiChange = aiPrev7d > 0 ? Math.round(((ai7d.length - aiPrev7d) / aiPrev7d) * 100) : 0;
   const exploited7d = last7d.filter((a) => a.exploitedAt).length;
   const cves7d = [...new Set(last7d.flatMap((a) => a.cves))];
   const activeActors = [...new Set(last7d.flatMap((a) => a.threatActors).filter(Boolean))];
@@ -140,12 +147,13 @@ export default async function ExecutivePage() {
       </Card>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 mb-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7 mb-6">
         {[
           { label: "Total (7d)", value: last7d.length, change: totalChange, color: "text-foreground" },
           { label: "Critical", value: critical7d, change: criticalChange, color: "text-threat-critical" },
           { label: "Zero-Days", value: zeroDays7d.length, color: "text-threat-high" },
           { label: "Ransomware", value: ransomware7d.length, color: "text-threat-high" },
+          { label: "AI Threats", value: ai7d.length, change: aiChange, color: "text-primary" },
           { label: "Exploited", value: exploited7d, color: "text-threat-critical" },
           { label: "CVEs", value: cves7d.length, color: "text-primary" },
         ].map((m) => (
@@ -337,9 +345,18 @@ export default async function ExecutivePage() {
                 </div>
               </div>
             )}
+            {ai7d.length > 0 && (
+              <div className="flex items-start gap-3 text-sm">
+                <span className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary text-[10px] font-bold shrink-0">{(critical7d > 0 ? 1 : 0) + (zeroDays7d.length > 0 ? 1 : 0) + (ransomware7d.length > 0 ? 1 : 0) + 1}</span>
+                <div>
+                  <span className="font-semibold text-foreground">AI Governance:</span>{" "}
+                  <span className="text-muted-foreground">{ai7d.length} AI/ML-related report{ai7d.length !== 1 ? "s" : ""} this week. Inventory internal LLM and agent deployments, enforce prompt-injection controls on user-facing AI features, and monitor vendor AI product advisories.</span>
+                </div>
+              </div>
+            )}
             <div className="flex items-start gap-3 text-sm">
               <span className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary text-[10px] font-bold shrink-0">
-                {(critical7d > 0 ? 1 : 0) + (zeroDays7d.length > 0 ? 1 : 0) + (ransomware7d.length > 0 ? 1 : 0) + 1}
+                {(critical7d > 0 ? 1 : 0) + (zeroDays7d.length > 0 ? 1 : 0) + (ransomware7d.length > 0 ? 1 : 0) + (ai7d.length > 0 ? 1 : 0) + 1}
               </span>
               <div>
                 <span className="font-semibold text-foreground">Ongoing:</span>{" "}
@@ -376,6 +393,14 @@ export default async function ExecutivePage() {
               <li className="flex items-start gap-2">
                 <span className="mt-1 h-1.5 w-1.5 rounded-full bg-threat-medium shrink-0" />
                 {supplyChain7d.length} supply chain threat{supplyChain7d.length > 1 ? "s" : ""} detected — review third-party dependencies and software bill of materials.
+              </li>
+            )}
+            {ai7d.length > 0 && (
+              <li className="flex items-start gap-2">
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                {ai7d.length} AI/ML security report{ai7d.length > 1 ? "s" : ""} this week
+                {aiChange !== 0 ? ` (${aiChange > 0 ? "up" : "down"} ${Math.abs(aiChange)}% vs. prior week)` : ""}
+                {" "}— review LLM, agent, and copilot exposure across internal and vendor AI systems.
               </li>
             )}
             <li className="flex items-start gap-2">

@@ -28,6 +28,7 @@ const CATEGORY_OPTIONS = [
   { value: "phishing", label: "Phishing" },
   { value: "insider-threat", label: "Insider Threat" },
   { value: "ddos", label: "DDoS" },
+  { value: "ai", label: "AI / ML" },
 ];
 
 const SUGGESTED_PRODUCTS = [

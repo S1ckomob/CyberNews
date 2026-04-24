@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { fetchArticles } from "@/lib/queries";
-import type { Industry } from "@/lib/types";
+import type { Article, Industry } from "@/lib/types";
 import { Building2, ChevronRight, AlertTriangle } from "lucide-react";
 
 export const metadata = {
@@ -13,11 +13,14 @@ export const metadata = {
     "Cybersecurity intelligence organized by industry sector.",
 };
 
-const INDUSTRIES: {
-  value: Industry;
+type SectorCard = {
   label: string;
   icon: string;
-}[] = [
+  href: string;
+  match: (a: Article) => boolean;
+};
+
+const INDUSTRIES: { value: Industry; label: string; icon: string }[] = [
   { value: "healthcare", label: "Healthcare", icon: "🏥" },
   { value: "finance", label: "Finance", icon: "🏦" },
   { value: "government", label: "Government", icon: "🏛️" },
@@ -28,6 +31,21 @@ const INDUSTRIES: {
   { value: "education", label: "Education", icon: "🎓" },
   { value: "telecommunications", label: "Telecommunications", icon: "📡" },
   { value: "manufacturing", label: "Manufacturing", icon: "🏭" },
+];
+
+const SECTORS: SectorCard[] = [
+  ...INDUSTRIES.map((ind) => ({
+    label: ind.label,
+    icon: ind.icon,
+    href: `/industry/${ind.value}`,
+    match: (a: Article) => a.industries.includes(ind.value),
+  })),
+  {
+    label: "AI / ML",
+    icon: "🧠",
+    href: "/ai-news",
+    match: (a: Article) => a.category === "ai",
+  },
 ];
 
 export default async function IndustriesPage() {
@@ -45,25 +63,20 @@ export default async function IndustriesPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {INDUSTRIES.map((industry) => {
-          const count = articles.filter((a) =>
-            a.industries.includes(industry.value)
-          ).length;
-          const criticalCount = articles.filter(
-            (a) =>
-              a.industries.includes(industry.value) &&
-              a.threatLevel === "critical"
-          ).length;
+        {SECTORS.map((sector) => {
+          const matching = articles.filter(sector.match);
+          const count = matching.length;
+          const criticalCount = matching.filter((a) => a.threatLevel === "critical").length;
 
           return (
-            <Link key={industry.value} href={`/industry/${industry.value}`}>
+            <Link key={sector.href} href={sector.href}>
               <Card className="group h-full transition-all hover:shadow-md hover:border-primary/30">
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between">
                     <div>
-                      <div className="text-2xl mb-2">{industry.icon}</div>
+                      <div className="text-2xl mb-2">{sector.icon}</div>
                       <h2 className="font-semibold group-hover:text-primary transition-colors">
-                        {industry.label}
+                        {sector.label}
                       </h2>
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors mt-1" />

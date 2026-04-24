@@ -34,18 +34,20 @@ import {
   Target,
   BarChart3,
   Bell,
+  Brain,
 } from "lucide-react";
 
 const primaryNav = [
   { name: "Dashboard", href: "/" },
   { name: "Intelligence", href: "/intelligence" },
   { name: "CVEs", href: "/cve" },
-  { name: "Dark Web", href: "/dark-web" },
   { name: "Blogs", href: "/blogs" },
   { name: "Threat Actors", href: "/threat-actors" },
 ];
 
 const moreNav = [
+  // Topics
+  { name: "AI News", href: "/ai-news", icon: Brain },
   // Analysis
   { name: "Executive", href: "/executive", icon: BarChart3 },
   { name: "Trends", href: "/trends", icon: TrendingUp },
@@ -65,9 +67,9 @@ const allNav = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Intelligence", href: "/intelligence", icon: Search },
   { name: "CVEs", href: "/cve", icon: Bug },
-  { name: "Dark Web", href: "/dark-web", icon: Eye },
   { name: "Blogs", href: "/blogs", icon: Bookmark },
   { name: "Threat Actors", href: "/threat-actors", icon: Users },
+  { name: "AI News", href: "/ai-news", icon: Brain },
   { name: "Executive", href: "/executive", icon: BarChart3 },
   { name: "Trends", href: "/trends", icon: TrendingUp },
   { name: "Threat Map", href: "/map", icon: Globe },

@@ -94,6 +94,17 @@ function guessCategory(text: string): string {
   if (t.includes("zero-day") || t.includes("0-day")) return "zero-day";
   if (t.includes("data breach") || t.includes("data leak") || t.includes("leak site") || t.includes("dark web") || t.includes("darknet") || t.includes("stolen data") || t.includes("credentials leaked") || t.includes("pwned")) return "data-breach";
   if (t.includes("supply chain") || t.includes("supply-chain") || t.includes("npm") || t.includes("pypi") || t.includes("malicious package") || t.includes("dependency confusion")) return "supply-chain";
+  if (
+    t.includes("prompt injection") || t.includes("indirect prompt") || t.includes("jailbreak") ||
+    t.includes("model poisoning") || t.includes("data poisoning") || t.includes("adversarial") ||
+    t.includes("llm ") || t.includes(" llm") || t.includes("large language model") ||
+    t.includes("generative ai") || t.includes("chatgpt") || t.includes("openai") ||
+    t.includes("anthropic") || t.includes("claude ") || t.includes("gemini") ||
+    t.includes("copilot") || t.includes("model context protocol") || t.includes(" mcp ") ||
+    t.includes("deepfake") || t.includes("deep fake") ||
+    t.includes("ai-powered") || t.includes("ai powered") ||
+    t.includes("ai agent") || t.includes("agentic")
+  ) return "ai";
   if (t.includes("apt") || t.includes("state-sponsored") || t.includes("espionage")) return "apt";
   if (t.includes("malware") || t.includes("trojan") || t.includes("botnet")) return "malware";
   if (t.includes("phishing")) return "phishing";

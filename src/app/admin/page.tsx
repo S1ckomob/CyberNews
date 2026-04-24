@@ -45,7 +45,7 @@ function adminHeaders(): HeadersInit {
 
 const CATEGORIES: Category[] = [
   "vulnerability", "malware", "ransomware", "data-breach", "apt",
-  "zero-day", "supply-chain", "phishing", "insider-threat", "ddos",
+  "zero-day", "supply-chain", "phishing", "insider-threat", "ddos", "ai",
 ];
 const THREAT_LEVELS: ThreatLevel[] = ["critical", "high", "medium", "low"];
 const INDUSTRIES: Industry[] = [

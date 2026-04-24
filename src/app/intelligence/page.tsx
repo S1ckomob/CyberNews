@@ -30,6 +30,7 @@ import {
   Monitor,
   Zap,
   Globe,
+  Brain,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -59,6 +60,7 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: "supply-chain", label: "Supply Chain" },
   { value: "phishing", label: "Phishing" },
   { value: "ddos", label: "DDoS" },
+  { value: "ai", label: "AI / ML" },
 ];
 type AppType = typeof APP_TYPES[number]["value"];
 const APP_TYPES = [
@@ -104,10 +106,10 @@ const PRESETS = [
   { id: "all", label: "All Intel", icon: BarChart3, category: undefined as Category | undefined, appType: undefined as string | undefined },
   { id: "zero-day", label: "Zero-Days", icon: Bug, category: "zero-day" as Category, appType: undefined as string | undefined },
   { id: "ransomware", label: "Ransomware", icon: Lock, category: "ransomware" as Category, appType: undefined as string | undefined },
+  { id: "ai", label: "AI / ML", icon: Brain, category: "ai" as Category, appType: undefined as string | undefined },
   { id: "firewall", label: "Firewalls", icon: Shield, category: undefined as Category | undefined, appType: "firewall" },
   { id: "microsoft", label: "Microsoft", icon: Monitor, category: undefined as Category | undefined, appType: "endpoint" },
   { id: "supply-chain", label: "Supply Chain", icon: Zap, category: "supply-chain" as Category, appType: undefined as string | undefined },
-  { id: "darkweb", label: "Dark Web", icon: Globe, category: undefined as Category | undefined, appType: "darkweb" },
 ] as const;
 
 export default function DashboardPage() {

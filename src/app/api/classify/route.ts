@@ -24,6 +24,7 @@ const classificationSchema = z.object({
     "phishing",
     "insider-threat",
     "ddos",
+    "ai",
   ]),
   cves: z.array(z.string()).describe("CVE IDs mentioned (e.g. CVE-2026-1234)"),
   affected_products: z
@@ -98,6 +99,8 @@ export async function POST(request: NextRequest) {
     prompt: `You are a cybersecurity threat intelligence analyst. Analyze the following raw threat intelligence text and classify it into a structured report.
 
 Be factual and professional. Do not speculate. Use the exact threat actor names as they are commonly known (e.g. "APT29", "LockBit", "Volt Typhoon").
+
+For category "ai": use when the primary subject is AI/ML security — LLM vulnerabilities, prompt injection, jailbreaks, model poisoning, adversarial ML, AI agents/MCP, deepfakes, AI-powered phishing, or named AI products (ChatGPT, Claude, Gemini, Copilot, OpenAI, Anthropic). If AI is only incidental, use the more specific category instead.
 
 For threat_level:
 - critical: Active exploitation of critical infrastructure, CVSS 9.0+, mass exploitation, major data breach

@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
   if (severity && (!Array.isArray(severity) || severity.some((s) => !validSeverities.includes(s)))) {
     return NextResponse.json({ error: "severity must be an array of: critical, high, medium, low" }, { status: 400 });
   }
-  const validCategories = ["vulnerability", "malware", "ransomware", "data-breach", "apt", "zero-day", "supply-chain", "phishing", "insider-threat", "ddos"];
+  const validCategories = ["vulnerability", "malware", "ransomware", "data-breach", "apt", "zero-day", "supply-chain", "phishing", "insider-threat", "ddos", "ai"];
   if (categories && (!Array.isArray(categories) || categories.some((c) => !validCategories.includes(c)))) {
     return NextResponse.json({ error: "Invalid categories" }, { status: 400 });
   }
