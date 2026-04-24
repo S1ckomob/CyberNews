@@ -41,13 +41,12 @@ const primaryNav = [
   { name: "Dashboard", href: "/" },
   { name: "Intelligence", href: "/intelligence" },
   { name: "CVEs", href: "/cve" },
+  { name: "AI News", href: "/ai-news" },
   { name: "Blogs", href: "/blogs" },
   { name: "Threat Actors", href: "/threat-actors" },
 ];
 
 const moreNav = [
-  // Topics
-  { name: "AI News", href: "/ai-news", icon: Brain },
   // Analysis
   { name: "Executive", href: "/executive", icon: BarChart3 },
   { name: "Trends", href: "/trends", icon: TrendingUp },
