@@ -11,7 +11,7 @@ import {
   fetchThreatActors,
   fetchThreatActorById,
   fetchThreatActorIds,
-  fetchArticles,
+  fetchArticlesByActor,
 } from "@/lib/queries";
 import type { Metadata } from "next";
 import {
@@ -70,12 +70,10 @@ export default async function ThreatActorPage({
   const actor = await fetchThreatActorById(id);
   if (!actor) notFound();
 
-  const articles = await fetchArticles();
-  const relatedArticles = articles.filter((a) =>
-    a.threatActors.some(
-      (t) => t === actor.name || actor.aliases.includes(t)
-    )
-  );
+  const relatedArticles = await fetchArticlesByActor([
+    actor.name,
+    ...actor.aliases,
+  ]);
 
   const pageUrl = `${siteUrl}/threat-actors/${id}`;
   const breadcrumbJsonLd = {

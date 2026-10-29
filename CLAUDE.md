@@ -31,6 +31,25 @@ Two Supabase clients coexist and are not interchangeable:
 
 RLS is enabled on all tables ([supabase/migrations/20240103000000_rls_and_cleanup.sql](supabase/migrations/20240103000000_rls_and_cleanup.sql)).
 
+### Supabase egress rules (the 2026-10 overage was this)
+
+`articles` has 20k+ rows and `content` is ~80% of each row's bytes. An
+unbounded `select("*")` returns PostgREST's 1000-row cap, ~3.3 MB per call,
+and the site used to issue that per article-page render and per 60-second
+client poll — which blew through the org's 250 GB/month egress plan.
+
+- Never `select("*")` on `articles` except for a single row by slug/id.
+  Use `ARTICLE_LIST_COLUMNS` from [src/lib/supabase.ts](src/lib/supabase.ts)
+  (everything but `content`) and always add `.limit()`.
+- Server pages get articles only through [src/lib/queries.ts](src/lib/queries.ts).
+  `fetchArticles()` is the cached 1000-row index (`unstable_cache`, 60 s);
+  detail pages use the targeted `fetchRelatedArticles` / `fetchArticlesByCve`
+  / `fetchArticlesByActor` helpers instead of scanning the index.
+- Client pages poll at most every 5 minutes; realtime handlers prepend
+  `payload.new` rather than refetching the list.
+- Don't build `.or()` filters out of many `ilike` patterns on `articles` —
+  it hits the statement timeout. Filter on exact values with `.in()`.
+
 ### Row → domain shape
 
 Postgres columns are `snake_case`; TS domain types are `camelCase`. Each page that reads Supabase redefines a small `rowToArticle(row: ArticleRow): Article` helper — this is intentional (avoids a shared dependency) but it means changes to [src/lib/types.ts](src/lib/types.ts) or the schema often require updating several of these helpers. [src/lib/queries.ts](src/lib/queries.ts) has the server-side versions used by server components.

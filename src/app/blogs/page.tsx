@@ -9,17 +9,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ArticleCard } from "@/components/article-card";
 import { supabase } from "@/lib/supabase";
 import type { Article } from "@/lib/types";
-import type { ArticleRow } from "@/lib/supabase";
+import { ARTICLE_LIST_COLUMNS } from "@/lib/supabase";
+import type { ArticleListRow } from "@/lib/supabase";
 import {
   Search, X, BookOpen, MessageSquare, Users, Rss,
   ExternalLink, TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-function rowToArticle(row: ArticleRow): Article {
+function rowToArticle(row: ArticleListRow): Article {
   return {
     id: row.id, title: row.title, slug: row.slug, summary: row.summary,
-    content: row.content, threatLevel: row.threat_level,
+    content: row.content ?? "", threatLevel: row.threat_level,
     category: row.category as Article["category"], cves: row.cves,
     affectedProducts: row.affected_products, threatActors: row.threat_actors,
     industries: row.industries as Article["industries"],
@@ -44,6 +45,20 @@ const ALL_BLOG_REDDIT = [...REDDIT_SOURCES, ...BLOG_SOURCES];
 
 type Tab = "all" | "reddit" | "blogs";
 
+// Server-side source filter so we only pull blog/reddit rows instead of the
+// whole table. Exact match on purpose: the ingest feeds write these names
+// verbatim, and an `or` of ilike patterns times out on 20k+ rows.
+const BLOG_PAGE_LIMIT = 300;
+
+function loadBlogArticles() {
+  return supabase
+    .from("articles")
+    .select(ARTICLE_LIST_COLUMNS)
+    .in("source", ALL_BLOG_REDDIT)
+    .order("published_at", { ascending: false })
+    .limit(BLOG_PAGE_LIMIT);
+}
+
 export default function BlogsPage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,25 +67,17 @@ export default function BlogsPage() {
 
   useEffect(() => {
     if (!supabase) return;
-    supabase
-      .from("articles")
-      .select("*")
-      .order("published_at", { ascending: false })
-      .then(({ data }) => {
-        if (data) setArticles(data.map(rowToArticle));
-        setLoading(false);
-      });
+    loadBlogArticles().then(({ data }) => {
+      if (data) setArticles((data as ArticleListRow[]).map(rowToArticle));
+      setLoading(false);
+    });
 
-    // Poll every 60 seconds
+    // Poll every 5 minutes
     const interval = setInterval(() => {
-      supabase
-        .from("articles")
-        .select("*")
-        .order("published_at", { ascending: false })
-        .then(({ data }) => {
-          if (data) setArticles(data.map(rowToArticle));
-        });
-    }, 60000);
+      loadBlogArticles().then(({ data }) => {
+        if (data) setArticles((data as ArticleListRow[]).map(rowToArticle));
+      });
+    }, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, []);

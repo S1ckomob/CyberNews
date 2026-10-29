@@ -1,14 +1,20 @@
-import { getSupabase } from "./supabase";
+import { unstable_cache } from "next/cache";
+import { getSupabase, ARTICLE_LIST_COLUMNS } from "./supabase";
 import type { Article, ThreatActor } from "./types";
-import type { ArticleRow, ThreatActorRow } from "./supabase";
+import type { ArticleListRow, ThreatActorRow } from "./supabase";
 
-function rowToArticle(row: ArticleRow): Article {
+// Egress note: `articles` holds 20k+ rows and `content` is ~80% of each row's
+// bytes. Every helper here selects ARTICLE_LIST_COLUMNS (no `content`) and
+// applies a limit, except fetchArticleBySlug which is the one place the full
+// body is rendered. List helpers return Article with `content: ""`.
+
+function rowToArticle(row: ArticleListRow): Article {
   return {
     id: row.id,
     title: row.title,
     slug: row.slug,
     summary: row.summary,
-    content: row.content,
+    content: row.content ?? "",
     threatLevel: row.threat_level,
     category: row.category as Article["category"],
     cves: row.cves,
@@ -44,30 +50,41 @@ function rowToThreatActor(row: ThreatActorRow): ThreatActor {
   };
 }
 
-export async function fetchArticles(): Promise<Article[]> {
-  const { data, error } = await getSupabase()
-    .from("articles")
-    .select("*")
-    .order("published_at", { ascending: false });
+// The most recent 1000 articles (PostgREST's max-rows cap, i.e. the same set
+// the old unbounded select actually returned), without `content`, cached for
+// 60s so every ISR revalidation across the site shares one Supabase fetch.
+const ARTICLE_INDEX_LIMIT = 1000;
 
-  if (error) {
-    console.error("Error fetching articles:", error);
-    return [];
-  }
-  return data.map(rowToArticle);
-}
+export const fetchArticles = unstable_cache(
+  async (): Promise<Article[]> => {
+    const { data, error } = await getSupabase()
+      .from("articles")
+      .select(ARTICLE_LIST_COLUMNS)
+      .order("published_at", { ascending: false })
+      .limit(ARTICLE_INDEX_LIMIT);
+
+    if (error) {
+      console.error("Error fetching articles:", error);
+      return [];
+    }
+    return (data as ArticleListRow[]).map(rowToArticle);
+  },
+  ["articles-index"],
+  { revalidate: 60, tags: ["articles"] }
+);
 
 export async function fetchArticlesLimited(limit = 30): Promise<Article[]> {
   const { data, error } = await getSupabase()
     .from("articles")
-    .select("*")
+    .select(ARTICLE_LIST_COLUMNS)
     .order("published_at", { ascending: false })
     .limit(limit);
 
   if (error) return [];
-  return data.map(rowToArticle);
+  return (data as ArticleListRow[]).map(rowToArticle);
 }
 
+// The only full-row read: the article page renders `content`.
 export async function fetchArticleBySlug(
   slug: string
 ): Promise<Article | null> {
@@ -82,16 +99,93 @@ export async function fetchArticleBySlug(
 }
 
 export async function fetchArticlesByIndustry(
-  industry: string
+  industry: string,
+  limit = 200
 ): Promise<Article[]> {
   const { data, error } = await getSupabase()
     .from("articles")
-    .select("*")
+    .select(ARTICLE_LIST_COLUMNS)
     .contains("industries", [industry])
-    .order("published_at", { ascending: false });
+    .order("published_at", { ascending: false })
+    .limit(limit);
 
   if (error) return [];
-  return data.map(rowToArticle);
+  return (data as ArticleListRow[]).map(rowToArticle);
+}
+
+// Articles tagged with a CVE id (stored uppercased; both cases are matched).
+export async function fetchArticlesByCve(
+  cveId: string,
+  limit = 50
+): Promise<Article[]> {
+  const ids = [...new Set([cveId.toUpperCase(), cveId.toLowerCase(), cveId])];
+  const { data, error } = await getSupabase()
+    .from("articles")
+    .select(ARTICLE_LIST_COLUMNS)
+    .overlaps("cves", ids)
+    .order("published_at", { ascending: false })
+    .limit(limit);
+
+  if (error) return [];
+  return (data as ArticleListRow[]).map(rowToArticle);
+}
+
+// Articles attributed to any of the given actor names/aliases.
+export async function fetchArticlesByActor(
+  names: string[],
+  limit = 100
+): Promise<Article[]> {
+  const wanted = names.filter(Boolean);
+  if (wanted.length === 0) return [];
+  const { data, error } = await getSupabase()
+    .from("articles")
+    .select(ARTICLE_LIST_COLUMNS)
+    .overlaps("threat_actors", wanted)
+    .order("published_at", { ascending: false })
+    .limit(limit);
+
+  if (error) return [];
+  return (data as ArticleListRow[]).map(rowToArticle);
+}
+
+// "Related" = shares a CVE, threat actor or affected product, else same
+// category — the same criteria the article page used to apply in memory over
+// the whole table. Runs as a few tiny targeted queries, newest first, merged
+// in that priority order and deduped.
+export async function fetchRelatedArticles(
+  article: Article,
+  limit = 3
+): Promise<Article[]> {
+  const base = () =>
+    getSupabase()
+      .from("articles")
+      .select(ARTICLE_LIST_COLUMNS)
+      .neq("id", article.id)
+      .order("published_at", { ascending: false })
+      .limit(limit);
+
+  const queries: PromiseLike<{ data: unknown; error: unknown }>[] = [];
+  if (article.cves.length) queries.push(base().overlaps("cves", article.cves));
+  const actors = article.threatActors.filter(Boolean);
+  if (actors.length) queries.push(base().overlaps("threat_actors", actors));
+  const products = article.affectedProducts.filter(Boolean);
+  if (products.length)
+    queries.push(base().overlaps("affected_products", products));
+  queries.push(base().eq("category", article.category));
+
+  const results = await Promise.all(queries);
+  const seen = new Set<string>();
+  const related: Article[] = [];
+  for (const { data, error } of results) {
+    if (error || !data) continue;
+    for (const row of data as ArticleListRow[]) {
+      if (seen.has(row.id)) continue;
+      seen.add(row.id);
+      related.push(rowToArticle(row));
+      if (related.length >= limit) return related;
+    }
+  }
+  return related;
 }
 
 export async function fetchThreatActors(): Promise<ThreatActor[]> {

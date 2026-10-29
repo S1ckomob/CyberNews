@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ArticleCard } from "@/components/article-card";
 import { supabase } from "@/lib/supabase";
-import type { ArticleRow } from "@/lib/supabase";
+import { ARTICLE_LIST_COLUMNS } from "@/lib/supabase";
+import type { ArticleListRow, ArticleRow } from "@/lib/supabase";
 import type { Article, ThreatLevel } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import {
@@ -24,10 +25,10 @@ import {
   Target,
 } from "lucide-react";
 
-function rowToArticle(row: ArticleRow): Article {
+function rowToArticle(row: ArticleListRow): Article {
   return {
     id: row.id, title: row.title, slug: row.slug, summary: row.summary,
-    content: row.content, threatLevel: row.threat_level,
+    content: row.content ?? "", threatLevel: row.threat_level,
     category: row.category as Article["category"], cves: row.cves,
     affectedProducts: row.affected_products, threatActors: row.threat_actors,
     industries: row.industries as Article["industries"],
@@ -97,9 +98,10 @@ export default function AiNewsPage() {
     if (!supabase) return;
     const { data } = await supabase
       .from("articles")
-      .select("*")
-      .order("published_at", { ascending: false });
-    if (data) setArticles(data.map(rowToArticle));
+      .select(ARTICLE_LIST_COLUMNS)
+      .order("published_at", { ascending: false })
+      .limit(500);
+    if (data) setArticles((data as ArticleListRow[]).map(rowToArticle));
     setLoading(false);
     setRefreshing(false);
     setLastUpdated(new Date());
@@ -107,14 +109,24 @@ export default function AiNewsPage() {
 
   useEffect(() => {
     load();
-    const interval = setInterval(load, 60000);
+    // Poll every 5 minutes; realtime (below) delivers new rows in between.
+    const interval = setInterval(load, 5 * 60 * 1000);
     if (!supabase) return () => clearInterval(interval);
 
     let channel: ReturnType<typeof supabase.channel> | null = null;
     try {
       channel = supabase
         .channel("ai-news-realtime")
-        .on("postgres_changes", { event: "*", schema: "public", table: "articles" }, () => load())
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "articles" },
+          (payload) => {
+            // Prepend the inserted row from the event payload — no refetch.
+            const row = payload.new as ArticleRow;
+            setArticles((prev) => [rowToArticle(row), ...prev.filter((a) => a.id !== row.id)]);
+            setLastUpdated(new Date());
+          }
+        )
         .subscribe();
     } catch {
       // polling handles it

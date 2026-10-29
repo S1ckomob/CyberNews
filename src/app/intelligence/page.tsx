@@ -12,7 +12,8 @@ import { ArticleCard } from "@/components/article-card";
 import { ThreatBadge } from "@/components/threat-badge";
 import { supabase } from "@/lib/supabase";
 import type { Article, ThreatLevel, Category, Industry } from "@/lib/types";
-import type { ArticleRow } from "@/lib/supabase";
+import { ARTICLE_LIST_COLUMNS } from "@/lib/supabase";
+import type { ArticleListRow, ArticleRow } from "@/lib/supabase";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import {
   Search,
@@ -34,10 +35,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-function rowToArticle(row: ArticleRow): Article {
+function rowToArticle(row: ArticleListRow): Article {
   return {
     id: row.id, title: row.title, slug: row.slug, summary: row.summary,
-    content: row.content, threatLevel: row.threat_level,
+    content: row.content ?? "", threatLevel: row.threat_level,
     category: row.category as Article["category"], cves: row.cves,
     affectedProducts: row.affected_products, threatActors: row.threat_actors,
     industries: row.industries as Article["industries"],
@@ -162,9 +163,10 @@ function IntelligenceFeed() {
   async function load() {
     const { data } = await supabase
       .from("articles")
-      .select("*")
-      .order("published_at", { ascending: false });
-    if (data) setArticles(data.map(rowToArticle));
+      .select(ARTICLE_LIST_COLUMNS)
+      .order("published_at", { ascending: false })
+      .limit(500);
+    if (data) setArticles((data as ArticleListRow[]).map(rowToArticle));
     setLoading(false);
     setRefreshing(false);
     setLastUpdated(new Date());
@@ -174,7 +176,8 @@ function IntelligenceFeed() {
     load();
 
     // Poll for new data every 60 seconds
-    const interval = setInterval(load, 60000);
+    // Poll every 5 minutes; realtime (below) delivers new rows in between.
+    const interval = setInterval(load, 5 * 60 * 1000);
 
     // Also try realtime if available
     if (!supabase) return () => clearInterval(interval);
@@ -183,7 +186,16 @@ function IntelligenceFeed() {
     try {
       channel = supabase
         .channel("articles-realtime")
-        .on("postgres_changes", { event: "*", schema: "public", table: "articles" }, () => load())
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "articles" },
+          (payload) => {
+            // Prepend the inserted row from the event payload — no refetch.
+            const row = payload.new as ArticleRow;
+            setArticles((prev) => [rowToArticle(row), ...prev.filter((a) => a.id !== row.id)]);
+            setLastUpdated(new Date());
+          }
+        )
         .subscribe();
     } catch {
       // WebSocket may not be available — polling handles it

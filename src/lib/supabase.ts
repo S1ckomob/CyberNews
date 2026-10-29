@@ -24,6 +24,13 @@ export const supabase =
     : (null as unknown as ReturnType<typeof createClient<Database>>);
 
 export type ArticleRow = Database["public"]["Tables"]["articles"]["Row"];
+
+// Every articles column except `content` (the article body, ~80% of row bytes).
+// List views, cards, counts and related-article lookups never render the body,
+// so they select this instead of "*" to keep Supabase egress down.
+export const ARTICLE_LIST_COLUMNS =
+  "id, title, slug, summary, threat_level, category, cves, affected_products, threat_actors, industries, attack_vector, source, source_url, published_at, updated_at, discovered_at, exploited_at, patched_at, verified, verified_by, tags, region";
+export type ArticleListRow = Omit<ArticleRow, "content"> & { content?: string };
 export type ThreatActorRow = Database["public"]["Tables"]["threat_actors"]["Row"];
 
 // Dummy client for build time — all queries return empty arrays
@@ -32,7 +39,7 @@ function createDummyClient() {
   const emptyRow = { data: null, error: null, count: null, status: 200, statusText: "OK" };
 
   const chainable: Record<string, unknown> = {};
-  const methods = ["select", "eq", "contains", "order", "limit", "single", "filter", "neq", "in"];
+  const methods = ["select", "eq", "contains", "overlaps", "or", "order", "limit", "single", "filter", "neq", "in"];
   for (const m of methods) {
     chainable[m] = (..._args: unknown[]) => {
       if (m === "single") return Promise.resolve(emptyRow);

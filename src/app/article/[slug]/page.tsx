@@ -11,7 +11,7 @@ import { ArticleCard } from "@/components/article-card";
 import { ArticleActions } from "@/components/article-actions";
 import { IOCPanel } from "@/components/ioc-panel";
 import {
-  fetchArticles,
+  fetchRelatedArticles,
   fetchArticleBySlug,
   fetchThreatActors,
   fetchArticleSlugs,
@@ -116,19 +116,7 @@ export default async function ArticlePage({
   const article = await fetchArticleBySlug(slug);
   if (!article) notFound();
 
-  const articles = await fetchArticles();
-  const relatedArticles = articles
-    .filter(
-      (a) =>
-        a.id !== article.id &&
-        (a.cves.some((c) => article.cves.includes(c)) ||
-          a.threatActors.some((t) => article.threatActors.includes(t)) ||
-          a.affectedProducts.some((p) =>
-            article.affectedProducts.includes(p)
-          ) ||
-          a.category === article.category)
-    )
-    .slice(0, 3);
+  const relatedArticles = await fetchRelatedArticles(article, 3);
 
   const threatActors = await fetchThreatActors();
   const linkedActors = threatActors.filter((a) =>

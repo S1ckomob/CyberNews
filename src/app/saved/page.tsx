@@ -7,13 +7,14 @@ import { ArticleCard } from "@/components/article-card";
 import { supabase } from "@/lib/supabase";
 import { getSavedSlugs } from "@/lib/saved-articles";
 import type { Article } from "@/lib/types";
-import type { ArticleRow } from "@/lib/supabase";
+import { ARTICLE_LIST_COLUMNS } from "@/lib/supabase";
+import type { ArticleListRow } from "@/lib/supabase";
 import { Bookmark } from "lucide-react";
 
-function rowToArticle(row: ArticleRow): Article {
+function rowToArticle(row: ArticleListRow): Article {
   return {
     id: row.id, title: row.title, slug: row.slug, summary: row.summary,
-    content: row.content, threatLevel: row.threat_level,
+    content: row.content ?? "", threatLevel: row.threat_level,
     category: row.category as Article["category"], cves: row.cves,
     affectedProducts: row.affected_products, threatActors: row.threat_actors,
     industries: row.industries as Article["industries"],
@@ -37,7 +38,7 @@ export default function SavedPage() {
     }
     supabase
       .from("articles")
-      .select("*")
+      .select(ARTICLE_LIST_COLUMNS)
       .in("slug", slugs)
       .then(({ data }) => {
         if (data) {

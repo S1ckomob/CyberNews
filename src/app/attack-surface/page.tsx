@@ -72,6 +72,7 @@ export default function AttackSurfacePage() {
       .from("articles")
       .select("*")
       .order("published_at", { ascending: false })
+      .limit(500)
       .then(({ data }) => {
         if (data) setArticles(data.map(rowToArticle));
         setLoading(false);

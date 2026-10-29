@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ThreatBadge } from "@/components/threat-badge";
 import { ArticleCard } from "@/components/article-card";
-import { fetchArticles } from "@/lib/queries";
+import { fetchArticlesByCve } from "@/lib/queries";
 import type { Metadata } from "next";
 import {
   AlertTriangle,
@@ -157,15 +157,11 @@ export default async function CVEDetailPage({
   const { id } = await params;
   const cveId = id.toUpperCase();
 
-  const [nvdData, articles, pocCount] = await Promise.all([
+  const [nvdData, relatedArticles, pocCount] = await Promise.all([
     fetchNVDData(cveId),
-    fetchArticles(),
+    fetchArticlesByCve(cveId),
     fetchGitHubPoCCount(cveId),
   ]);
-
-  const relatedArticles = articles.filter((a) =>
-    a.cves.some((c) => c.toUpperCase() === cveId)
-  );
 
   const exploited = relatedArticles.some((a) => a.exploitedAt);
   const patchStatus = derivePatchStatus(nvdData, relatedArticles);

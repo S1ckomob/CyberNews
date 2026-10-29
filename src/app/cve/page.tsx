@@ -10,17 +10,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ThreatBadge } from "@/components/threat-badge";
 import { supabase } from "@/lib/supabase";
 import type { Article, ThreatLevel } from "@/lib/types";
-import type { ArticleRow } from "@/lib/supabase";
+import { ARTICLE_LIST_COLUMNS } from "@/lib/supabase";
+import type { ArticleListRow } from "@/lib/supabase";
 import {
   Search, Tag, AlertTriangle, ExternalLink, Box,
   SlidersHorizontal, X, Shield, Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-function rowToArticle(row: ArticleRow): Article {
+function rowToArticle(row: ArticleListRow): Article {
   return {
     id: row.id, title: row.title, slug: row.slug, summary: row.summary,
-    content: row.content, threatLevel: row.threat_level,
+    content: row.content ?? "", threatLevel: row.threat_level,
     category: row.category as Article["category"], cves: row.cves,
     affectedProducts: row.affected_products, threatActors: row.threat_actors,
     industries: row.industries as Article["industries"],
@@ -55,8 +56,9 @@ export default function CvePage() {
     if (!supabase) return;
     supabase
       .from("articles")
-      .select("*")
+      .select(ARTICLE_LIST_COLUMNS)
       .order("published_at", { ascending: false })
+      .limit(500)
       .then(({ data }) => {
         if (data) setArticles(data.map(rowToArticle));
         setLoading(false);
